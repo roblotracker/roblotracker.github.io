@@ -17,3 +17,7 @@ The site also serves short links at `/privacy/` and `/terms/`. The alternate `/p
 ## Public address
 
 The primary GitHub Pages site is https://roblotracker.github.io/. Its publishing source is the `/docs` folder on the `main` branch of `roblotracker/roblotracker.github.io`.
+
+## Public usage totals
+
+The homepage reads `docs/assets/stats-source.json`. Its `endpoint` is `null` until a production feed is set. Configure the bot’s optional `/public-stats` route using its AWS deployment guide, serve that route behind HTTPS, then set the JSON value to the endpoint URL. The browser sends no credentials. The response has two nonnegative integer fields, `tracked_accounts` and `discord_servers`. Keep credentials, IDs, and individual rows out of the feed.

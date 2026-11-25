@@ -9,13 +9,13 @@
   <meta property="og:description" content="Rules for installing and using RobloTracker in a Discord server.">
   <title>Terms of Service | RobloTracker</title>
   <link rel="icon" type="image/webp" href="assets/rt-logo.webp">
-  <link rel="stylesheet" href="assets/site.css?v=fullscreen">
+  <link rel="stylesheet" href="assets/site.css?v=polish">
 </head>
-<body>
+<body class="legal-page">
   <a class="skip" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="wrap top">
-      <a class="brand" href="./"><img src="assets/rt-logo.webp" alt="" width="34" height="34">RobloTracker</a>
+      <a class="brand" href="./"><img src="assets/rt-logo.webp" alt="" width="34" height="34"><span class="brand-name">RobloTracker</span></a>
       <nav class="nav" aria-label="Main navigation">
         <a href="./#features">Features</a>
         <a href="./#commands">Commands</a>
@@ -28,14 +28,15 @@
   <main id="main">
     
 <section class="legal-hero">
-  <div class="wrap">
+  <div class="wrap legal-masthead">
     <h1>Terms of Service</h1>
     <p>Rules for installing and using RobloTracker in a Discord server.</p>
-    <p>Last updated <time datetime="2026-11-25">November 25, 2026</time></p>
+    <p class="policy-date">Updated <time datetime="2026-11-25">November 25, 2026</time></p>
+    <div class="policy-links"><a href="#acceptable-use">Acceptable use</a><a href="privacy.html">Privacy Policy</a></div>
   </div>
 </section>
 <div class="wrap policy-layout">
-  <nav class="toc" aria-label="On this page"><strong>On this page</strong><a href="#service">The service</a><a href="#eligibility">Who may install and use RobloTracker</a><a href="#acceptable-use">Acceptable use</a><a href="#permissions">Server permissions and alert controls</a><a href="#accuracy">Alert timing and accuracy</a><a href="#privacy">Privacy and removing a profile</a><a href="#changes">Changes, restrictions, and removal</a><a href="#availability">Third-party services and legal rights</a><a href="#configuration">Set up trackers responsibly</a><a href="#visibility">Sharing alerts outside your server</a><a href="#third-party-limits">What Roblox and Discord control</a><a href="#moderation">Handling misuse and outages</a><a href="#stop">Stopping tracking and leaving a server</a><a href="#contact">Contact the RobloTracker team</a></nav>
+  <nav class="toc" aria-label="On this page"><strong>On this page</strong><div class="toc-links"><a href="#service">The service</a><a href="#eligibility">Who may install and use RobloTracker</a><a href="#acceptable-use">Acceptable use</a><a href="#permissions">Server permissions and alert controls</a><a href="#accuracy">Alert timing and accuracy</a><a href="#public-stats">Public usage totals</a><a href="#privacy">Privacy and removing a profile</a><a href="#changes">Changes, restrictions, and removal</a><a href="#availability">Third-party services and legal rights</a><a href="#configuration">Set up trackers responsibly</a><a href="#visibility">Sharing alerts outside your server</a><a href="#third-party-limits">What Roblox and Discord control</a><a href="#moderation">Handling misuse and outages</a><a href="#stop">Stopping tracking and leaving a server</a><a href="#contact">Contact the RobloTracker team</a></div></nav>
   <article class="policy" aria-label="Terms of Service"><section id="service"><h2>The service</h2>
 <p>RobloTracker is an independent application that observes supported public Roblox profile changes and can deliver alerts in Discord. These terms apply to the RobloTracker bot and this website. By installing or using RobloTracker, you agree to follow the rules below and the applicable rules of Discord and Roblox.</p>
 <p>RobloTracker is independently operated and has no affiliation with or endorsement from Roblox or Discord. Availability and visibility can differ by profile, server, location, endpoint, and over time.</p>
@@ -62,6 +63,9 @@
 <section id="accuracy"><h2>Alert timing and accuracy</h2>
 <p>RobloTracker checks public API responses on a schedule. The first observation establishes a baseline. Later alerts may be delayed, skipped, or incomplete because of rate limits, server permissions, upstream outages, or information that changes between polls. Game information, named friends, and session duration can be incomplete or estimated.</p>
 <p>Use the application as an informational tool. Verify anything important with the relevant platform before acting. RobloTracker does not promise uninterrupted operation, complete coverage, or a fixed delivery time.</p>
+</section>
+<section id="public-stats"><h2>Public usage totals</h2>
+<p>The website may show totals for active tracked accounts and Discord installations. The figures are cached and can lag behind recent setup, removal, or availability changes. They are informational and do not establish any service level or guarantee that a particular tracker is working. See <a href="privacy.html#public-totals">how these totals are handled</a> or use <code>/status</code> to check your server.</p>
 </section>
 <section id="privacy"><h2>Privacy and removing a profile</h2>
 <p>Read the <a href="privacy.html">Privacy Policy</a> for information on collection, storage, visibility, and retention. An account holder can ask RobloTracker to review removal after verifying control with <code>/privacy remove</code> and <code>/privacy verify</code>. If the automated workflow is unavailable, the support team can help with the next step.</p>

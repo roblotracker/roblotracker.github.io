@@ -9,13 +9,13 @@
   <meta property="og:description" content="What RobloTracker reads and stores, who can see it, and how to request removal.">
   <title>Privacy Policy | RobloTracker</title>
   <link rel="icon" type="image/webp" href="assets/rt-logo.webp">
-  <link rel="stylesheet" href="assets/site.css?v=fullscreen">
+  <link rel="stylesheet" href="assets/site.css?v=polish">
 </head>
-<body>
+<body class="legal-page">
   <a class="skip" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="wrap top">
-      <a class="brand" href="./"><img src="assets/rt-logo.webp" alt="" width="34" height="34">RobloTracker</a>
+      <a class="brand" href="./"><img src="assets/rt-logo.webp" alt="" width="34" height="34"><span class="brand-name">RobloTracker</span></a>
       <nav class="nav" aria-label="Main navigation">
         <a href="./#features">Features</a>
         <a href="./#commands">Commands</a>
@@ -28,14 +28,15 @@
   <main id="main">
     
 <section class="legal-hero">
-  <div class="wrap">
+  <div class="wrap legal-masthead">
     <h1>Privacy Policy</h1>
     <p>What RobloTracker reads and stores, who can see it, and how to request removal.</p>
-    <p>Last updated <time datetime="2026-11-25">November 25, 2026</time></p>
+    <p class="policy-date">Updated <time datetime="2026-11-25">November 25, 2026</time></p>
+    <div class="policy-links"><a href="privacy.html#requests">Request data removal</a><a href="terms.html">Terms of Service</a></div>
   </div>
 </section>
 <div class="wrap policy-layout">
-  <nav class="toc" aria-label="On this page"><strong>On this page</strong><a href="#scope">Who this covers</a><a href="#data">Information RobloTracker handles</a><a href="#use">How we use the information</a><a href="#visibility">Who can see tracker data</a><a href="#processors">Hosting and service providers</a><a href="#retention">Retention and copies</a><a href="#requests">Request removal or ask about your data</a><a href="#safety">Younger users and security</a><a href="#inputs">What comes from you, a server, or Roblox</a><a href="#observations">Live checks, snapshots, and alerts</a><a href="#verification">What happens during verification</a><a href="#deletion-outcomes">What to expect after a deletion request</a><a href="#support-details">What to include in a private ticket</a><a href="#changes">Changes and contact</a></nav>
+  <nav class="toc" aria-label="On this page"><strong>On this page</strong><div class="toc-links"><a href="#scope">Who this covers</a><a href="#data">Information RobloTracker handles</a><a href="#use">How we use the information</a><a href="#visibility">Who can see tracker data</a><a href="#processors">Hosting and service providers</a><a href="#public-totals">Public usage totals</a><a href="#retention">Retention and copies</a><a href="#requests">Request removal or ask about your data</a><a href="#safety">Younger users and security</a><a href="#inputs">What comes from you, a server, or Roblox</a><a href="#observations">Live checks, snapshots, and alerts</a><a href="#verification">What happens during verification</a><a href="#deletion-outcomes">What to expect after a deletion request</a><a href="#support-details">What to include in a private ticket</a><a href="#changes">Changes and contact</a></div></nav>
   <article class="policy" aria-label="Privacy Policy"><section id="scope"><h2>Who this covers</h2>
 <p>This policy covers the RobloTracker Discord application, the RobloTracker support server workflows described here, and this website. The RobloTracker team operates the bot independently. Discord, Roblox, and GitHub operate their own services under their own policies.</p>
 <p>A member with the required Discord permissions chooses the Roblox profile to monitor. A profile may be monitored even when its Roblox account holder has never interacted with the bot. Publicly accessible profile information can still be personal information.</p>
@@ -59,6 +60,10 @@
 <p>Discord delivers commands, alerts, and support messages. Roblox supplies the public profile data used for tracking. RobloTracker’s hosting and configured database providers process operational data and may retain backups or logs under their own policies. Depending on the deployment, RobloTracker can use PostgreSQL or Supabase for primary storage, SQLite on a persistent host, and Turso for some archived alert details. The optional archive is not a complete copy of tracker data.</p>
 <p>This is a static GitHub Pages website. It has no sign-in, contact form, first-party tracking scripts, or application cookies. GitHub may process technical request information to deliver and protect the site. Clicking an invite or support link opens Discord. Review each platform’s policy for how it handles your visits and account information.</p>
 <p><a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement">GitHub Privacy Statement</a> · <a href="https://discord.com/privacy">Discord Privacy Policy</a> · <a href="https://en.help.roblox.com/hc/en-us/articles/115004630823-Roblox-Privacy-and-Cookie-Policy">Roblox Privacy and Cookie Policy</a></p>
+</section>
+<section id="public-totals"><h2>Public usage totals</h2>
+<p>The website can display two aggregate figures when the service makes them available. The first counts distinct Roblox accounts with active trackers, so one account tracked in several servers counts once. The second counts Discord servers where the bot is installed, including those without an active tracker.</p>
+<p>The statistics response contains these totals only. It contains no Roblox usernames or user IDs, Discord server or member IDs, channel data, or individual history. When the website fetches the totals from a separate service, that service receives the technical information needed to handle the request, including the browser's originating site.</p>
 </section>
 <section id="retention"><h2>Retention and copies</h2>
 <p>RobloTracker retains tracker configuration and the latest saved snapshot while the tracker exists. A server operator can use <code>/untrack-account</code> to stop tracking and remove that tracker’s current record. Alert history follows the deployment retention setting, which defaults to 30 days and can be configured from 14 to 365 days.</p>

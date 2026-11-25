@@ -9,13 +9,14 @@
   <meta property="og:description" content="Track public Roblox profile changes in Discord. Add RobloTracker, explore the setup guide, and find privacy controls and support.">
   <title>RobloTracker | Roblox alerts for Discord</title>
   <link rel="icon" type="image/webp" href="assets/rt-logo.webp">
-  <link rel="stylesheet" href="assets/site.css?v=fullscreen">
+  <link rel="stylesheet" href="assets/site.css?v=polish">
+  <script src="assets/site.js?v=polish" defer></script>
 </head>
 <body class="landing-page">
   <a class="skip" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="wrap top">
-      <a class="brand" href="./"><img src="assets/rt-logo.webp" alt="" width="34" height="34">RobloTracker</a>
+      <a class="brand" href="./"><img src="assets/rt-logo.webp" alt="" width="34" height="34"><span class="brand-name">RobloTracker</span></a>
       <nav class="nav" aria-label="Main navigation">
         <a href="./#features">Features</a>
         <a href="./#commands">Commands</a>
@@ -34,10 +35,20 @@
         <p>Get activity and profile updates in a dedicated Discord channel. Decide which changes ping your team.</p>
         <div class="actions">
           <a class="button" href="https://discord.com/oauth2/authorize?client_id=1561527919375814709&amp;permissions=268823568&amp;scope=bot%20applications.commands&amp;integration_type=0" aria-label="Add RobloTracker to Discord"><img src="assets/discord.svg" alt="" width="22" height="22">Add</a>
-          <a class="button secondary" href="#features">Explore features</a>
+          <a class="button secondary explore-button" href="#features">Explore features</a>
         </div>
       </div>
       <a class="hero-scroll" href="#features" aria-label="Scroll to features"></a>
+    </section>
+
+    <section class="stats-strip" aria-labelledby="stats-title">
+      <div class="wrap stats-inner">
+        <div><h2 id="stats-title">RobloTracker in numbers</h2><p class="stats-status" role="status">Live totals are currently unavailable.</p></div>
+        <dl class="stats-counts">
+          <div><dt>Roblox accounts tracked</dt><dd data-stat="tracked_accounts" aria-label="Unavailable">—</dd></div>
+          <div><dt>Discord servers</dt><dd data-stat="discord_servers" aria-label="Unavailable">—</dd></div>
+        </dl>
+      </div>
     </section>
 
     <section class="section wrap capabilities" id="features" aria-labelledby="features-title">
