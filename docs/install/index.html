@@ -10,7 +10,7 @@
   <title>Install RobloTracker</title>
   <link rel="canonical" href="https://roblotracker.github.io/install/">
   <link rel="icon" type="image/webp" href="../assets/rt-logo.webp">
-  <link rel="stylesheet" href="../assets/site.css?v=install">
+  <link rel="stylesheet" href="../assets/site.css?v=install-guide">
 </head>
 <body class="install-page">
   <a class="skip" href="#main">Skip to content</a>
@@ -28,44 +28,41 @@
   </header>
   <main id="main">
     <section class="install-masthead" aria-labelledby="install-title">
-      <div class="wrap install-layout">
-        <div class="install-intro">
-          <img class="install-logo" src="../assets/rt-logo.webp" alt="" width="64" height="64">
-          <h1 id="install-title">Install RobloTracker<span> for Discord.</span></h1>
-          <p>Choose a server you manage, review the permissions in Discord, and set up your first Roblox tracker.</p>
-          <a class="button install-action" href="https://discord.com/oauth2/authorize?client_id=1561527919375814709&amp;permissions=268823568&amp;scope=bot%20applications.commands&amp;integration_type=0">
-            <img src="../assets/discord.svg" alt="" width="22" height="22">Continue to Discord
-          </a>
-          <p class="install-note">You’ll authorize RobloTracker on Discord. A Roblox login is unnecessary.</p>
-        </div>
-        <section class="install-permissions" aria-labelledby="permissions-title">
-          <h2 id="permissions-title">What RT needs access to</h2>
-          <dl>
-            <div><dt>Manage Channels and Roles</dt><dd>Create tracker channels and set access for their recipients.</dd></div>
-            <div><dt>View Channels, Send Messages, and Read Message History</dt><dd>Send alerts and find earlier messages when needed.</dd></div>
-            <div><dt>Embed Links, Attach Files, and Use External Emojis</dt><dd>Include links and images in alerts and command screens.</dd></div>
-            <div><dt>Manage Messages</dt><dd>Remove related alert messages during supported cleanup.</dd></div>
-          </dl>
-        </section>
+      <div class="wrap install-intro">
+        <img class="install-logo" src="../assets/rt-logo.webp" alt="" width="76" height="76">
+        <h1 id="install-title">Add RobloTracker to Discord</h1>
+        <p>Install RT in a server you manage to get Roblox activity and profile alerts in Discord.</p>
+        <a class="button install-action" href="https://discord.com/oauth2/authorize?client_id=1561527919375814709&amp;permissions=268823568&amp;scope=bot%20applications.commands&amp;integration_type=0">
+          <img src="../assets/discord.svg" alt="" width="22" height="22">Continue to Discord
+        </a>
+        <p class="install-note">Choose your server and review permissions on Discord.</p>
       </div>
     </section>
-    <section class="wrap section split" aria-labelledby="after-install-title">
+    <section class="wrap section install-details" aria-labelledby="after-install-title">
       <div class="section-intro">
-        <h2 id="after-install-title">Your first tracker</h2>
-        <p>Run these commands in the server where you installed RT.</p>
+        <h2 id="after-install-title">Set up your first tracker</h2>
+        <p>Run these commands in the server where you added RT.</p>
       </div>
-      <ol class="steps">
-        <li><h3><code>/setup</code></h3><p>Check that RT has the permissions it needs.</p></li>
-        <li><h3><code>/track-account</code></h3><p>Enter the Roblox username or ID and pick the changes you want to watch.</p></li>
-        <li><h3><code>/alerts settings</code></h3><p>Choose which changes can ping your saved recipients.</p></li>
+      <ol class="install-steps">
+        <li><h3><code>/setup</code></h3><p>Check that RT can create and configure tracker channels.</p></li>
+        <li><h3><code>/track-account</code></h3><p>Enter a Roblox username or ID, then pick which changes to watch.</p></li>
+        <li><h3><code>/alerts settings</code></h3><p>Choose which alerts ping your saved recipients.</p></li>
       </ol>
+      <details class="install-permissions">
+        <summary>What permissions does RT request?</summary>
+        <p class="permission-intro">Review the requested permissions in Discord before you authorize. The invite does not request Administrator.</p>
+        <dl>
+          <div><dt>Manage Channels and Roles</dt><dd>Create tracker channels and set access for recipients.</dd></div>
+          <div><dt>View Channels, Send Messages, and Read Message History</dt><dd>Deliver alerts and find earlier messages as needed.</dd></div>
+          <div><dt>Embed Links, Attach Files, and Use External Emojis</dt><dd>Show profile links, alert images, and RT icons.</dd></div>
+          <div><dt>Manage Messages</dt><dd>Remove related alert messages during supported cleanup.</dd></div>
+        </dl>
+      </details>
+      <div class="install-help">
+        <div><h2>Can’t see your server?</h2><p>Check that you’re on the right Discord account and have Manage Server permission.</p></div>
+        <a class="section-link" href="https://discord.gg/475THD4ftT">Get help in Discord</a>
+      </div>
     </section>
-    <div class="surface">
-      <section class="wrap section support install-support" aria-labelledby="install-help-title">
-        <div class="section-intro"><h2 id="install-help-title">Can’t see your server?</h2><p>Check that you’re signed into the right Discord account and have permission to manage the server.</p></div>
-        <a class="button secondary" href="https://discord.gg/475THD4ftT">Get help in Discord</a>
-      </section>
-    </div>
   </main>
   <footer class="site-footer">
     <div class="wrap foot">
