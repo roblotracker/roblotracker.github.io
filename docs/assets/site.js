@@ -17,37 +17,53 @@
   const fields = Array.from(stats.querySelectorAll("[data-stat]"));
   const format = new Intl.NumberFormat();
 
+  const baseline = Date.parse(stats.dataset.snapshotAt);
+
   async function getJSON(url) {
-    const response = await fetch(url, {
-      credentials: "omit", redirect: "error", signal: AbortSignal.timeout(4500),
-    });
-    if (!response.ok) throw new Error("Stats unavailable");
-    return response.json();
+    const timer = new AbortController();
+    const timeout = setTimeout(() => timer.abort(), 4500);
+    try {
+      const response = await fetch(url, {
+        cache: "no-store", credentials: "omit", redirect: "error", signal: timer.signal,
+      });
+      if (!response.ok) throw new Error("Stats unavailable");
+      const date = Date.parse(response.headers.get("Date"));
+      const age = Number(response.headers.get("Age"));
+      return { body: await response.json(), time: Number.isFinite(date) ? date + Math.max(0, age || 0) * 1000 : null };
+    } finally {
+      clearTimeout(timeout);
+    }
   }
 
   async function showStats() {
     try {
-      const { endpoint, snapshot } = await getJSON("assets/stats-source.json");
+      const config = await getJSON("assets/stats-source.json?v=verified");
+      const { endpoint, snapshot } = config.body;
       if (typeof endpoint !== "string" || !endpoint) return;
       const url = new URL(endpoint, location.href);
       if (url.protocol !== "https:" || url.username || url.password) return;
-      const totals = await getJSON(url);
+      const { body: totals } = await getJSON(url);
       if (!fields.every(node => Number.isSafeInteger(totals?.[node.dataset.stat]) && totals[node.dataset.stat] >= 0)) return;
       let stamp;
       if (snapshot === true) {
         const updatedAt = totals.updated_at;
         if (typeof updatedAt !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(updatedAt)) return;
         stamp = new Date(updatedAt);
-        const age = Date.now() - stamp.getTime();
-        if (!Number.isFinite(age) || age < -5 * 60_000 || age > 2 * 60 * 60_000) return;
+        const age = (config.time ?? Date.now()) - stamp.getTime();
+        if (!Number.isFinite(age) || age < -5 * 60_000 || age > 2 * 60 * 60_000 || stamp.getTime() < baseline) return;
       }
       fields.forEach(node => {
         node.textContent = format.format(totals[node.dataset.stat]);
         node.removeAttribute("aria-label");
       });
-      status.textContent = stamp
-        ? "Updated " + new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(stamp)
-        : "Counts can lag by a few minutes.";
+      if (stamp) {
+        const time = document.createElement("time");
+        time.dateTime = stamp.toISOString();
+        time.textContent = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(stamp);
+        status.replaceChildren("Updated ", time);
+      } else {
+        status.textContent = "Counts can lag by a few minutes.";
+      }
       if (motion.matches || !("IntersectionObserver" in window)) return;
       const observer = new IntersectionObserver(([entry]) => {
         if (!entry.isIntersecting) return;
@@ -60,7 +76,7 @@
       });
       observer.observe(stats);
     } catch {
-      // Keep the unavailable state if the optional feed fails.
+      // Keep the dated HTML snapshot if the live refresh fails.
     }
   }
 
