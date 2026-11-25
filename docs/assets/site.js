@@ -11,6 +11,18 @@
     update();
   }
 
+  const categories = document.querySelectorAll(".feature-index a");
+  if (categories.length) {
+    const setCurrentCategory = () => {
+      categories.forEach(link => {
+        if (link.hash === location.hash) link.setAttribute("aria-current", "location");
+        else link.removeAttribute("aria-current");
+      });
+    };
+    window.addEventListener("hashchange", setCurrentCategory);
+    setCurrentCategory();
+  }
+
   const stats = document.querySelector(".stats-strip");
   if (!stats) return;
   const status = stats.querySelector(".stats-status");
