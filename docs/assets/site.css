@@ -488,3 +488,8 @@ section[id] { scroll-margin-top: 1.5rem; }
     to { transform: scaleX(1); opacity: 0; }
   }
 }
+
+.developer-section { padding-bottom: clamp(2rem, 4vw, 3.5rem); }
+.developer-credits dt { overflow-wrap: anywhere; }
+.landing-page .support { border-top: 1px solid var(--line); }
+.landing-page .foot nav { align-content: flex-start; row-gap: .55rem; }
