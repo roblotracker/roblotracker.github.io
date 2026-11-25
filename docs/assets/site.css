@@ -403,3 +403,31 @@ section[id] { scroll-margin-top: 1.5rem; }
   .brand-name, .hero-scroll { transition: none; }
   .hero-scroll.is-away { translate: none; }
 }
+
+.install-masthead {
+  background: radial-gradient(ellipse at top left, #1b2a55, #141d34 52%, #101522 100%);
+  border-bottom: 1px solid #303d60;
+}
+.install-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(2.2rem, 6vw, 5.2rem);
+  padding-block: clamp(2.6rem, 7vw, 5.8rem);
+}
+.install-logo { border: 1px solid #6b87ff84; border-radius: 15px; margin-bottom: 1rem; }
+.install-intro h1 { font-size: clamp(2.55rem, 5.2vw, 3.55rem); line-height: 1.04; letter-spacing: -.06em; }
+.install-intro h1 span { display: block; color: #a5baff; }
+.install-intro > p { max-width: 29rem; margin-top: .9rem; }
+.install-action { margin-top: 1.35rem; }
+.install-intro .install-note { margin-top: .7rem; font-size: .88rem; }
+.install-permissions { border-top: 1px solid #566896; padding-top: .9rem; }
+.install-permissions h2 { font-size: clamp(1.35rem, 3.3vw, 1.85rem); margin-bottom: .45rem; }
+.install-permissions dl > div { padding-block: .65rem; border-bottom: 1px solid #34415e; }
+.install-permissions dt { font-weight: 660; color: #eef2ff; }
+.install-permissions dd { font-size: .94rem; line-height: 1.5; }
+.install-support { padding-block: 2rem; }
+.install-support h2 { font-size: clamp(1.65rem, 3vw, 2.25rem); }
+@media (max-width: 720px) {
+  .install-layout { grid-template-columns: 1fr; gap: 2rem; }
+}

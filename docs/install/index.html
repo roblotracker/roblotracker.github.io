@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Add RobloTracker to a Discord server, review the requested permissions, and set up your first Roblox tracker.">
+  <meta name="theme-color" content="#0e1119">
+  <meta property="og:title" content="Install RobloTracker">
+  <meta property="og:description" content="Add RobloTracker to Discord and set up your first tracker.">
+  <title>Install RobloTracker</title>
+  <link rel="canonical" href="https://roblotracker.github.io/install/">
+  <link rel="icon" type="image/webp" href="../assets/rt-logo.webp">
+  <link rel="stylesheet" href="../assets/site.css?v=install">
+</head>
+<body class="install-page">
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="site-header">
+    <div class="wrap top">
+      <a class="brand" href="../"><img src="../assets/rt-logo.webp" alt="" width="34" height="34"><span class="brand-name">RobloTracker</span></a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="../#features">Features</a>
+        <a href="../#commands">Commands</a>
+        <a href="../#setup">Setup</a>
+        <a href="https://discord.gg/475THD4ftT">Support</a>
+        <a class="button small" href="https://discord.com/oauth2/authorize?client_id=1561527919375814709&amp;permissions=268823568&amp;scope=bot%20applications.commands&amp;integration_type=0" aria-label="Authorize RobloTracker in Discord"><img src="../assets/discord.svg" alt="" width="20" height="20">Add</a>
+      </nav>
+    </div>
+  </header>
+  <main id="main">
+    <section class="install-masthead" aria-labelledby="install-title">
+      <div class="wrap install-layout">
+        <div class="install-intro">
+          <img class="install-logo" src="../assets/rt-logo.webp" alt="" width="64" height="64">
+          <h1 id="install-title">Install RobloTracker<span> for Discord.</span></h1>
+          <p>Choose a server you manage, review the permissions in Discord, and set up your first Roblox tracker.</p>
+          <a class="button install-action" href="https://discord.com/oauth2/authorize?client_id=1561527919375814709&amp;permissions=268823568&amp;scope=bot%20applications.commands&amp;integration_type=0">
+            <img src="../assets/discord.svg" alt="" width="22" height="22">Continue to Discord
+          </a>
+          <p class="install-note">You’ll authorize RobloTracker on Discord. A Roblox login is unnecessary.</p>
+        </div>
+        <section class="install-permissions" aria-labelledby="permissions-title">
+          <h2 id="permissions-title">What RT needs access to</h2>
+          <dl>
+            <div><dt>Manage Channels and Roles</dt><dd>Create tracker channels and set access for their recipients.</dd></div>
+            <div><dt>View Channels, Send Messages, and Read Message History</dt><dd>Send alerts and find earlier messages when needed.</dd></div>
+            <div><dt>Embed Links, Attach Files, and Use External Emojis</dt><dd>Include links and images in alerts and command screens.</dd></div>
+            <div><dt>Manage Messages</dt><dd>Remove related alert messages during supported cleanup.</dd></div>
+          </dl>
+        </section>
+      </div>
+    </section>
+    <section class="wrap section split" aria-labelledby="after-install-title">
+      <div class="section-intro">
+        <h2 id="after-install-title">Your first tracker</h2>
+        <p>Run these commands in the server where you installed RT.</p>
+      </div>
+      <ol class="steps">
+        <li><h3><code>/setup</code></h3><p>Check that RT has the permissions it needs.</p></li>
+        <li><h3><code>/track-account</code></h3><p>Enter the Roblox username or ID and pick the changes you want to watch.</p></li>
+        <li><h3><code>/alerts settings</code></h3><p>Choose which changes can ping your saved recipients.</p></li>
+      </ol>
+    </section>
+    <div class="surface">
+      <section class="wrap section support install-support" aria-labelledby="install-help-title">
+        <div class="section-intro"><h2 id="install-help-title">Can’t see your server?</h2><p>Check that you’re signed into the right Discord account and have permission to manage the server.</p></div>
+        <a class="button secondary" href="https://discord.gg/475THD4ftT">Get help in Discord</a>
+      </section>
+    </div>
+  </main>
+  <footer class="site-footer">
+    <div class="wrap foot">
+      <div><a class="brand" href="../">RobloTracker</a><p>Independent Discord bot for public Roblox activity.</p></div>
+      <nav aria-label="Footer navigation"><a href="./" aria-current="page">Install</a><a href="../#setup">Setup</a><a href="https://discord.gg/475THD4ftT">Support</a><a href="../terms/">Terms of Service</a><a href="../privacy/">Privacy Policy</a></nav>
+    </div>
+  </footer>
+</body>
+</html>
