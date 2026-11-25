@@ -63,7 +63,7 @@
 </section>
 <section id="public-totals"><h2>Public usage totals</h2>
 <p>The website can display two aggregate figures when the service makes them available. The first counts distinct Roblox accounts with active trackers, so one account tracked in several servers counts once. The second counts Discord servers where the bot is installed, including those without an active tracker.</p>
-<p>The statistics response contains these totals only. It contains no Roblox usernames or user IDs, Discord server or member IDs, channel data, or individual history. When the website fetches the totals from a separate service, that service receives the technical information needed to handle the request, including the browser's originating site.</p>
+<p>The bot produces these two totals. A separate process publishes them to GitHub along with the snapshot time. The published file contains no Roblox usernames or user IDs, Discord server or member IDs, channel data, or individual history. GitHub serves the file to your browser and can receive technical request information under its own privacy policy.</p>
 </section>
 <section id="retention"><h2>Retention and copies</h2>
 <p>RobloTracker retains tracker configuration and the latest saved snapshot while the tracker exists. A server operator can use <code>/untrack-account</code> to stop tracking and remove that tracker’s current record. Alert history follows the deployment retention setting, which defaults to 30 days and can be configured from 14 to 365 days.</p>

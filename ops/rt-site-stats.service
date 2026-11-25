@@ -1,0 +1,16 @@
+[Unit]
+Description=Publish anonymous RobloTracker usage totals
+After=network-online.target itbot.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+ExecStart=/usr/bin/python3 /home/ubuntu/.config/rt-site-stats/publish-stats.py
+TimeoutStartSec=90
+UMask=0077
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=/home/ubuntu/.local/state/rt-site-stats
+PrivateTmp=true

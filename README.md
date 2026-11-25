@@ -20,4 +20,6 @@ The primary GitHub Pages site is https://roblotracker.github.io/. Its publishing
 
 ## Public usage totals
 
-The homepage reads `docs/assets/stats-source.json`. Its `endpoint` is `null` until a production feed is set. Configure the bot’s optional `/public-stats` route using its AWS deployment guide, serve that route behind HTTPS, then set the JSON value to the endpoint URL. The browser sends no credentials. The response has two nonnegative integer fields, `tracked_accounts` and `discord_servers`. Keep credentials, IDs, and individual rows out of the feed.
+The website reads a timestamped JSON snapshot from the separate [stats repository](https://github.com/Duncanmmm123/roblotracker-stats). The EC2 timer checks the bot's private loopback endpoint every 15 minutes and publishes when the counts change or the last snapshot is an hour old. The file contains only `tracked_accounts`, `discord_servers`, and `updated_at`. The site hides totals from snapshots more than two hours old.
+
+The publisher and systemd units are in `ops/`. The service runs as `ubuntu` and expects its dedicated deploy key and GitHub host entry under `~/.config/rt-site-stats/`. Keep that deploy key limited to the stats repository. For a manual refresh run `sudo systemctl start rt-site-stats.service`. Check the last run with `sudo journalctl -u rt-site-stats.service -n 15 --no-pager`. The bot can continue running while the exporter is stopped.

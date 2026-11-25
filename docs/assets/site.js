@@ -27,17 +27,27 @@
 
   async function showStats() {
     try {
-      const { endpoint } = await getJSON("assets/stats-source.json");
+      const { endpoint, snapshot } = await getJSON("assets/stats-source.json");
       if (typeof endpoint !== "string" || !endpoint) return;
       const url = new URL(endpoint, location.href);
       if (url.protocol !== "https:" || url.username || url.password) return;
       const totals = await getJSON(url);
       if (!fields.every(node => Number.isSafeInteger(totals?.[node.dataset.stat]) && totals[node.dataset.stat] >= 0)) return;
+      let stamp;
+      if (snapshot === true) {
+        const updatedAt = totals.updated_at;
+        if (typeof updatedAt !== "string" || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(updatedAt)) return;
+        stamp = new Date(updatedAt);
+        const age = Date.now() - stamp.getTime();
+        if (!Number.isFinite(age) || age < -5 * 60_000 || age > 2 * 60 * 60_000) return;
+      }
       fields.forEach(node => {
         node.textContent = format.format(totals[node.dataset.stat]);
         node.removeAttribute("aria-label");
       });
-      status.textContent = "Counts can lag by a few minutes.";
+      status.textContent = stamp
+        ? "Updated " + new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(stamp)
+        : "Counts can lag by a few minutes.";
       if (motion.matches || !("IntersectionObserver" in window)) return;
       const observer = new IntersectionObserver(([entry]) => {
         if (!entry.isIntersecting) return;
