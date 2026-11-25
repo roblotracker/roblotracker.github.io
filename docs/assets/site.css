@@ -260,8 +260,8 @@ section[id] { scroll-margin-top: 1.5rem; }
 
 .landing-page .hero-logo { width: clamp(68px, 7vw, 88px); margin-bottom: 1.05rem; }
 .landing-page .hero h1 { font-size: clamp(2.35rem, 5.6vw, 4.65rem); text-wrap: balance; }
-.landing-page .hero p { max-width: 34rem; margin-top: 1.05rem; text-wrap: pretty; }
-.landing-page .actions { margin-top: 1.35rem; }
+.landing-page .hero p { max-width: 31rem; margin-top: 1.15rem; text-wrap: pretty; }
+.landing-page .actions { margin-top: 1.5rem; }
 .capabilities { padding-block: clamp(2.65rem, 5.6vw, 4.6rem); }
 .features-header {
   display: flex;
@@ -355,7 +355,7 @@ section[id] { scroll-margin-top: 1.5rem; }
 
 .brand-name { transition: color .18s ease; }
 .brand:hover .brand-name, .brand:focus-visible .brand-name { color: #a3c4ff; }
-.hero .explore-button { background: #22335f9c; border-color: #829bdb67; }
+.hero .explore-button { background: #1d2b4e; border-color: #566b9d; }
 .hero .explore-button:hover { background: #324986; border-color: #a7bdff; }
 .hero-scroll {
   transition: opacity .24s ease, translate .24s ease, visibility 0s, background-color .16s, border-color .16s;
@@ -441,7 +441,8 @@ section[id] { scroll-margin-top: 1.5rem; }
   text-align: center;
 }
 .install-intro { padding-block: clamp(2.75rem, 8vw, 5rem); }
-.install-logo { margin: 0 auto 1.2rem; border: 1px solid #6b87ff84; border-radius: 16px; }
+.install-logo { margin: 0 auto 1.3rem; border: 1px solid #8ca3ff90; border-radius: 17px; }
+.install-intro .button, .hero .actions > .button:first-child { box-shadow: 0 6px 23px #09134167; }
 .install-intro h1 {
   max-width: 16ch;
   margin-inline: auto;
@@ -450,5 +451,34 @@ section[id] { scroll-margin-top: 1.5rem; }
   letter-spacing: -.052em;
   text-wrap: balance;
 }
-.install-intro p { max-width: 28rem; margin: 1rem auto 0; }
-.install-action { margin-top: 1.25rem; }
+.install-intro p { max-width: 27rem; margin: 1.05rem auto 0; text-wrap: pretty; }
+.install-action { margin-top: 1.35rem; }
+
+
+@media (prefers-reduced-motion: no-preference) {
+  html[data-page-progress]::before {
+    content: "";
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 12;
+    height: 3px;
+    pointer-events: none;
+    background: linear-gradient(90deg, #365dff, #9cbcff);
+    transform-origin: left;
+  }
+  html[data-page-progress="loading"]::before {
+    animation: page-progress .8s cubic-bezier(.12, .68, .22, 1) both;
+  }
+  html[data-page-progress="complete"]::before {
+    animation: page-progress-complete .25s ease-out both;
+  }
+  @keyframes page-progress {
+    from { transform: scaleX(.14); }
+    to { transform: scaleX(.84); }
+  }
+  @keyframes page-progress-complete {
+    from { transform: scaleX(.84); opacity: 1; }
+    55% { transform: scaleX(1); opacity: 1; }
+    to { transform: scaleX(1); opacity: 0; }
+  }
+}
