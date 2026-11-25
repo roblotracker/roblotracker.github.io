@@ -10,7 +10,7 @@
   <title>Install RobloTracker</title>
   <link rel="canonical" href="https://roblotracker.github.io/install/">
   <link rel="icon" type="image/webp" href="../assets/rt-logo.webp">
-  <link rel="stylesheet" href="../assets/site.css?v=install-guide">
+  <link rel="stylesheet" href="../assets/site.css?v=guided">
 </head>
 <body class="install-page">
   <a class="skip" href="#main">Skip to content</a>
@@ -29,26 +29,32 @@
   <main id="main">
     <section class="install-masthead" aria-labelledby="install-title">
       <div class="wrap install-intro">
-        <img class="install-logo" src="../assets/rt-logo.webp" alt="" width="76" height="76">
-        <h1 id="install-title">Add RobloTracker to Discord</h1>
-        <p>Install RT in a server you manage to get Roblox activity and profile alerts in Discord.</p>
-        <a class="button install-action" href="https://discord.com/oauth2/authorize?client_id=1561527919375814709&amp;permissions=268823568&amp;scope=bot%20applications.commands&amp;integration_type=0">
-          <img src="../assets/discord.svg" alt="" width="22" height="22">Continue to Discord
-        </a>
-        <p class="install-note">Choose your server and review permissions on Discord.</p>
+        <div class="install-overview">
+          <img class="install-logo" src="../assets/rt-logo.webp" alt="" width="68" height="68">
+          <h1 id="install-title">Bring Roblox alerts to your server.</h1>
+          <p>RT creates a dedicated channel for each Roblox account you track. Pick the updates you want and who should get pinged.</p>
+        </div>
+        <section class="install-authorization" aria-labelledby="authorize-title">
+          <h2 id="authorize-title">Add RobloTracker</h2>
+          <p>Use a Discord account with <strong>Manage Server</strong> permission for the server you’re adding RT to.</p>
+          <a class="button install-action" href="https://discord.com/oauth2/authorize?client_id=1561527919375814709&amp;permissions=268823568&amp;scope=bot%20applications.commands&amp;integration_type=0">
+            <img src="../assets/discord.svg" alt="" width="22" height="22">Continue to Discord
+          </a>
+          <a class="install-note" href="#permission-guide">Review what RT can access</a>
+        </section>
       </div>
     </section>
     <section class="wrap section install-details" aria-labelledby="after-install-title">
       <div class="section-intro">
-        <h2 id="after-install-title">Set up your first tracker</h2>
-        <p>Run these commands in the server where you added RT.</p>
+        <h2 id="after-install-title">From install to first alert</h2>
+        <p>Once Discord confirms the install, return to your server and run these commands.</p>
       </div>
       <ol class="install-steps">
-        <li><h3><code>/setup</code></h3><p>Check that RT can create and configure tracker channels.</p></li>
-        <li><h3><code>/track-account</code></h3><p>Enter a Roblox username or ID, then pick which changes to watch.</p></li>
-        <li><h3><code>/alerts settings</code></h3><p>Choose which alerts ping your saved recipients.</p></li>
+        <li><h3>Check your server</h3><code>/setup</code><p>Check channel permissions so RT can create the tracker.</p></li>
+        <li><h3>Add a Roblox profile</h3><code>/track-account</code><p>Enter a username or ID, then choose which changes you want to follow.</p></li>
+        <li><h3>Choose when to ping</h3><code>/alerts settings</code><p>Pick the alerts that can mention your saved recipients.</p></li>
       </ol>
-      <details class="install-permissions">
+      <details class="install-permissions" id="permission-guide" open>
         <summary>What permissions does RT request?</summary>
         <p class="permission-intro">Review the requested permissions in Discord before you authorize. The invite does not request Administrator.</p>
         <dl>
@@ -59,7 +65,7 @@
         </dl>
       </details>
       <div class="install-help">
-        <div><h2>Can’t see your server?</h2><p>Check that you’re on the right Discord account and have Manage Server permission.</p></div>
+        <div><h2>Can’t see your server?</h2><p>Switch to the Discord account that manages the server. If you can see your server but authorization fails, check the role permissions in that server.</p></div>
         <a class="section-link" href="https://discord.gg/475THD4ftT">Get help in Discord</a>
       </div>
     </section>

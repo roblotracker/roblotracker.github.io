@@ -317,16 +317,15 @@ section[id] { scroll-margin-top: 1.5rem; }
 }
 .feature-row h3 { font-size: clamp(1.35rem, 2.65vw, 1.8rem); }
 .feature-row p { max-width: 43rem; }
-.feature-row ul {
-  display: flex;
-  flex-wrap: wrap;
-  gap: .22rem 1.8rem;
-  margin: .55rem 0 0;
-  padding-left: 1.05rem;
-  color: #d8e2f9;
+.feature-row .feature-next {
+  margin-top: .8rem;
+  padding: .55rem .8rem;
+  border-left: 2px solid #647fe0;
+  background: #182136;
+  color: #d3def7;
   font-size: .92rem;
 }
-.feature-row li::marker { color: #8ea9ff; }
+.feature-next strong { display: inline-block; margin-right: .35rem; color: #e6edff; }
 .feature-row:target h3, .commands > div:target dt code { color: #a5baff; }
 .commands > div[id] { scroll-margin-top: 1.5rem; }
 
@@ -432,23 +431,37 @@ section[id] { scroll-margin-top: 1.5rem; }
 }
 
 .install-masthead {
-  text-align: center;
-  background: radial-gradient(ellipse at 50% 12%, #202e5a, #141d34 62%, #101522 100%);
+  background:
+    linear-gradient(106deg, #172343f5, #17213bf2 56%, #111827e3),
+    url("rt-wallpaper.webp") center / cover;
   border-bottom: 1px solid #303d60;
 }
-.install-intro { padding-block: clamp(2.25rem, 6vw, 4.6rem); }
-.install-logo { margin: 0 auto 1.1rem; border: 1px solid #6b87ff84; border-radius: 18px; }
-.install-intro h1 {
-  max-width: 46rem;
-  margin-inline: auto;
-  font-size: clamp(2.45rem, 5vw, 4rem);
+.install-intro {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(16rem, .8fr);
+  align-items: center;
+  gap: clamp(1.7rem, 6vw, 5rem);
+  padding-block: clamp(2.3rem, 6vw, 4.5rem);
+}
+.install-logo { margin-bottom: 1rem; border: 1px solid #6b87ff84; border-radius: 15px; }
+.install-overview h1 {
+  max-width: 13ch;
+  font-size: clamp(2.6rem, 5.5vw, 4.55rem);
   line-height: 1.04;
-  letter-spacing: -.052em;
+  letter-spacing: -.055em;
   text-wrap: balance;
 }
-.install-intro > p { max-width: 29rem; margin: .9rem auto 0; }
-.install-action { margin-top: 1.2rem; }
-.install-intro .install-note { margin-top: .65rem; font-size: .9rem; }
+.install-overview p { max-width: 30rem; margin-top: .85rem; }
+.install-authorization {
+  padding: clamp(1.15rem, 3vw, 1.9rem);
+  background: #111827;
+  border: 1px solid #415481;
+  border-radius: .85rem;
+}
+.install-authorization h2 { font-size: clamp(1.48rem, 3vw, 1.9rem); margin-bottom: .55rem; }
+.install-authorization strong { color: #e3eaff; }
+.install-action { width: 100%; margin-top: 1.15rem; }
+.install-note { display: block; margin-top: .7rem; font-size: .91rem; text-align: center; }
 .install-details { max-width: 56rem; }
 .install-details .section-intro h2 { font-size: clamp(1.8rem, 4vw, 2.65rem); }
 .install-steps {
@@ -461,6 +474,7 @@ section[id] { scroll-margin-top: 1.5rem; }
 }
 .install-steps li::marker { color: var(--link); font-weight: 700; }
 .install-steps h3 { margin-bottom: .4rem; font-size: 1.03rem; }
+.install-steps code { display: inline-block; padding: .08rem .35rem; margin-bottom: .35rem; border-radius: .3rem; background: #1b263d; }
 .install-steps p { line-height: 1.5; }
 .install-permissions {
   padding: .95rem 1.15rem;
@@ -485,5 +499,6 @@ section[id] { scroll-margin-top: 1.5rem; }
 }
 .install-help h2 { font-size: 1.35rem; margin-bottom: .25rem; }
 @media (max-width: 690px) {
+  .install-intro { grid-template-columns: 1fr; gap: 1.4rem; }
   .install-steps { grid-template-columns: 1fr; gap: .9rem; }
 }

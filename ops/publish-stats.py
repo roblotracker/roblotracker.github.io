@@ -11,7 +11,7 @@ import urllib.request
 BOT_STATS = "http://127.0.0.1:8000/public-stats"
 GITHUB_REMOTE = "ssh://git@ssh.github.com:443/Duncanmmm123/roblotracker-stats.git"
 FIELDS = ("tracked_accounts", "discord_servers")
-HEARTBEAT = timedelta(hours=1)
+HEARTBEAT = timedelta(minutes=5)
 
 config = Path.home() / ".config/rt-site-stats"
 checkout = Path.home() / ".local/state/rt-site-stats/repo"
@@ -70,10 +70,13 @@ def main() -> None:
         git("clone", "--quiet", "--depth=1", "--branch", "main", GITHUB_REMOTE, str(checkout), cwd=checkout.parent)
     if git("remote", "get-url", "origin", capture=True) != GITHUB_REMOTE:
         raise RuntimeError("Unexpected stats repository remote")
-    git("pull", "--quiet", "--ff-only", "origin", "main")
-
     snapshot = checkout / "public-stats.json"
     now = datetime.now(timezone.utc)
+    if recent_snapshot(snapshot, counts, now) and not git("rev-list", "origin/main..HEAD", capture=True):
+        print("The published counts are current.")
+        return
+
+    git("pull", "--quiet", "--ff-only", "origin", "main")
     if not recent_snapshot(snapshot, counts, now):
         contents = {**counts, "updated_at": now.isoformat(timespec="seconds").replace("+00:00", "Z")}
         snapshot.write_text(json.dumps(contents) + "\n", encoding="utf-8")

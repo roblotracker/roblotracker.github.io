@@ -1,1 +1,1 @@
-{"endpoint":"https://raw.githubusercontent.com/Duncanmmm123/roblotracker-stats/main/public-stats.json","snapshot":true}
+{"endpoint":"https://api.github.com/repos/Duncanmmm123/roblotracker-stats/contents/public-stats.json","fallback":"https://raw.githubusercontent.com/Duncanmmm123/roblotracker-stats/main/public-stats.json"}

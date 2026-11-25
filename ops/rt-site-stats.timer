@@ -3,7 +3,8 @@ Description=Refresh RobloTracker's public usage snapshot
 
 [Timer]
 OnBootSec=2min
-OnUnitInactiveSec=15min
+OnUnitInactiveSec=2min
+AccuracySec=5s
 
 [Install]
 WantedBy=timers.target

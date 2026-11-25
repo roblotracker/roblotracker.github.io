@@ -9,8 +9,8 @@
   <meta property="og:description" content="Track public Roblox profile changes in Discord. Add RobloTracker, explore the setup guide, and find privacy controls and support.">
   <title>RobloTracker | Roblox alerts for Discord</title>
   <link rel="icon" type="image/webp" href="assets/rt-logo.webp">
-  <link rel="stylesheet" href="assets/site.css?v=install-guide">
-  <script src="assets/site.js?v=stats-fallback" defer></script>
+  <link rel="stylesheet" href="assets/site.css?v=guided">
+  <script src="assets/site.js?v=stats-refresh" defer></script>
 </head>
 <body class="landing-page">
   <a class="skip" href="#main">Skip to content</a>
@@ -41,9 +41,9 @@
       <a class="hero-scroll" href="#features" aria-label="Scroll to features"></a>
     </section>
 
-    <section class="stats-strip" aria-labelledby="stats-title" data-snapshot-at="2026-11-25T19:52:50Z">
+    <section class="stats-strip" aria-labelledby="stats-title" data-snapshot-at="2026-11-25T20:19:34Z">
       <div class="wrap stats-inner">
-        <div><h2 id="stats-title">RobloTracker in numbers</h2><p class="stats-status" role="status">Last verified snapshot <time datetime="2026-11-25T19:52:50Z">Nov 25, 2026 at 19:52 UTC</time></p></div>
+        <div><h2 id="stats-title">RobloTracker in numbers</h2><p class="stats-status" role="status">Last verified snapshot <time datetime="2026-11-25T20:19:34Z">Nov 25, 2026 at 20:19 UTC</time></p></div>
         <dl class="stats-counts">
           <div><dt>Roblox accounts tracked</dt><dd data-stat="tracked_accounts">33</dd></div>
           <div><dt>Discord servers</dt><dd data-stat="discord_servers">12</dd></div>
@@ -54,8 +54,8 @@
     <section class="section wrap capabilities" id="features" aria-labelledby="features-title">
       <header class="features-header">
         <div>
-          <h2 id="features-title">RobloTracker features</h2>
-          <p>See what RT can track and which Discord commands control it.</p>
+          <h2 id="features-title">What can you do with RT?</h2>
+          <p>Pick a task to see what RT checks and how to use it in Discord.</p>
         </div>
         <a href="#setup" class="section-link">Set up your first tracker</a>
       </header>
@@ -71,45 +71,45 @@
 
         <div class="feature-list">
           <section class="feature-row" id="activity" aria-labelledby="activity-title">
-            <div><h3 id="activity-title">Roblox activity</h3><a href="#command-join-game"><code>/join-game</code></a></div>
+            <div><h3 id="activity-title">Follow a play session</h3><a href="#command-join-game"><code>/join-game</code></a></div>
             <div>
-              <p>See when a tracked profile comes online, starts or leaves an experience, goes offline, or opens Studio. Session lengths are estimates based on the checks RT receives.</p>
-              <ul><li>Public presence and game details</li><li>Game links when Roblox provides them</li></ul>
+              <p>See public online, offline, Studio, and in-game changes. If Roblox returns the experience, RT can include its name or a link. Session lengths are estimates from observed activity.</p>
+              <p class="feature-next"><strong>In Discord</strong> Enable activity alerts in <code>/settings</code>. Use <code>/join-game</code> to check the current public status.</p>
             </div>
           </section>
           <section class="feature-row" id="profile" aria-labelledby="profile-title">
-            <div><h3 id="profile-title">Profile and avatar</h3><a href="#command-track-info"><code>/track-info</code></a></div>
+            <div><h3 id="profile-title">Spot a profile or avatar change</h3><a href="#command-track-info"><code>/track-info</code></a></div>
             <div>
-              <p>Follow username, display name, bio, and avatar changes. When images are available, some alerts include an experience preview or a before-and-after avatar comparison.</p>
-              <ul><li>Names, bios, and profile links</li><li>Avatar renders, worn items, and outfits</li></ul>
+              <p>Follow changes to usernames, display names, bios, and avatars. Some avatar alerts include a before-and-after image when both renders are available.</p>
+              <p class="feature-next"><strong>In Discord</strong> Open <code>/track-info</code> to see what RT last observed for the profile.</p>
             </div>
           </section>
           <section class="feature-row" id="social" aria-labelledby="social-title">
-            <div><h3 id="social-title">Friends and collections</h3><a href="#command-track-info"><code>/track-info</code></a></div>
+            <div><h3 id="social-title">Browse friends, badges, and collections</h3><a href="#command-track-info"><code>/track-info</code></a></div>
             <div>
-              <p>Browse public friends, badges, groups, favorite experiences, and item collections when Roblox makes them available. Friend totals can appear on their own. Named friend alerts require a complete list.</p>
-              <ul><li>Friend counts and verified named changes</li><li>Public collections and group roles</li></ul>
+              <p>Explore public friends, badges, groups, outfits, and favorite experiences. Roblox may return only the friend count. RT uses complete lists for named friend alerts.</p>
+              <p class="feature-next"><strong>In Discord</strong> Open <code>/track-info</code> and choose the Friends or Badges section.</p>
             </div>
           </section>
           <section class="feature-row" id="delivery" aria-labelledby="delivery-title">
-            <div><h3 id="delivery-title">Alert delivery</h3><a href="#command-alerts"><code>/alerts settings</code></a></div>
+            <div><h3 id="delivery-title">Choose what gets a ping</h3><a href="#command-alerts"><code>/alerts settings</code></a></div>
             <div>
-              <p>RT creates a private tracker channel for each account. Choose which changes can ping, set a cooldown, add or remove recipients, and pick a primary recipient. Server managers can set defaults for new trackers.</p>
-              <ul><li>Per-account monitors and recipients</li><li>Channel repair with saved settings</li></ul>
+              <p>Each tracker has its own Discord channel. You can set a cooldown, pick which changes can mention people, and assign the primary recipient.</p>
+              <p class="feature-next"><strong>In Discord</strong> Use <code>/alerts settings</code> to change delivery and <code>/alerts recipients list</code> to check the recipients.</p>
             </div>
           </section>
           <section class="feature-row" id="history" aria-labelledby="history-title">
-            <div><h3 id="history-title">History and health</h3><a href="#command-user-history"><code>/user-history</code></a></div>
+            <div><h3 id="history-title">Find an earlier alert</h3><a href="#command-user-history"><code>/user-history</code></a></div>
             <div>
-              <p>Page through delivered alerts for a profile. Server managers can check which monitors are getting data and whether RT can reach each alert channel.</p>
-              <ul><li>Saved changes and tracker capacity</li><li>Monitor and delivery checks</li></ul>
+              <p>Review delivered alerts by profile or check which monitors are still getting data. Server managers can see whether alert channels are reachable.</p>
+              <p class="feature-next"><strong>In Discord</strong> Use <code>/user-history</code> for saved changes and <code>/status</code> for service checks.</p>
             </div>
           </section>
           <section class="feature-row" id="data-controls" aria-labelledby="data-controls-title">
-            <div><h3 id="data-controls-title">Privacy controls</h3><a href="privacy.html#requests">Data removal guide</a></div>
+            <div><h3 id="data-controls-title">Request removal of a profile</h3><a href="privacy.html#requests">Data removal guide</a></div>
             <div>
-              <p>RT reads public Roblox data. Account holders can verify their profile and request removal through the bot. The support team reviews verified requests in a restricted channel.</p>
-              <ul><li>Profile verification</li><li>Private request status</li></ul>
+              <p>If you control a tracked Roblox profile, you can verify it and ask RT’s team to review a removal request.</p>
+              <p class="feature-next"><strong>In Discord</strong> Start with <code>/privacy remove</code>, then follow <code>/privacy verify</code> and check <code>/privacy status</code>.</p>
             </div>
           </section>
         </div>
