@@ -268,87 +268,56 @@ section[id] { scroll-margin-top: 1.5rem; }
 .landing-page .hero h1 { font-size: clamp(2.35rem, 5.6vw, 4.65rem); text-wrap: balance; }
 .landing-page .hero p { max-width: 31rem; margin-top: 1.15rem; text-wrap: pretty; }
 .landing-page .actions { margin-top: 1.5rem; }
-.capabilities { padding-block: clamp(2.65rem, 5.6vw, 4.6rem); }
 .features-header {
   display: flex;
   justify-content: space-between;
   align-items: end;
-  gap: 1rem;
-  margin-bottom: 1.4rem;
+  gap: 1rem 2rem;
+  margin-bottom: clamp(1.45rem, 3.5vw, 2.35rem);
 }
-.features-header h2 { font-size: clamp(2rem, 4.6vw, 3.25rem); }
-.features-header p { margin-top: .45rem; }
-.section-link { flex: none; font-weight: 660; }
-.feature-layout {
-  display: grid;
-  grid-template-columns: minmax(11rem, .42fr) minmax(0, 1.58fr);
-  align-items: start;
-  gap: clamp(2rem, 5vw, 5rem);
-  border-top: 1px solid var(--line);
-}
-.feature-index {
-  position: sticky;
-  top: calc(var(--nav-offset) + .3rem);
-  display: grid;
-  gap: .12rem;
-  margin-top: 1.2rem;
-}
-.feature-index a {
-  display: flex;
+.features-header p { margin-top: .65rem; text-wrap: pretty; }
+.section-link, .feature-link {
+  display: inline-flex;
   align-items: center;
-  min-height: 42px;
-  padding: .4rem .72rem;
-  border-left: 2px solid transparent;
-  border-radius: 0 .45rem .45rem 0;
-  color: #cbd7fb;
-  font-size: .94rem;
+  gap: .55rem;
+  width: fit-content;
+  min-height: 44px;
+  font-weight: 660;
   text-decoration: none;
 }
-.feature-index a:hover, .feature-index a:focus-visible, .feature-index a[aria-current="location"] {
-  color: #fff;
-  background: #1b253d;
-  border-color: #819cff;
+.section-link { flex: none; }
+.section-link:is(:hover, :focus-visible), .feature-link:is(:hover, :focus-visible) {
+  text-decoration: underline;
+}
+.feature-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: clamp(1.5rem, 4vw, 3.5rem);
 }
 .feature-row {
-  padding-block: clamp(1.35rem, 3vw, 2rem);
-  border-bottom: 1px solid var(--line);
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  justify-items: start;
+  gap: .65rem;
+  padding-block: 1.4rem 1rem;
+  border-top: 1px solid var(--line);
 }
-.feature-row > div:first-child {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: .4rem 1.1rem;
-  margin-bottom: .5rem;
-}
-.feature-row h3 { font-size: clamp(1.35rem, 2.65vw, 1.8rem); }
-.feature-row p { max-width: 43rem; }
-.feature-row .feature-next {
-  margin-top: .8rem;
-  padding: .55rem .8rem;
-  border-left: 2px solid #647fe0;
-  background: #182136;
-  color: #d3def7;
-  font-size: .92rem;
-}
-.feature-next strong { display: inline-block; margin-right: .35rem; color: #e6edff; }
+.feature-row h3 { font-size: clamp(1.25rem, 2vw, 1.55rem); text-wrap: balance; }
+.feature-row p { max-width: 37ch; text-wrap: pretty; }
+.feature-link { font-size: .93rem; }
+.feature-link code { color: inherit; }
+.feature-row:target { border-color: var(--link); }
 .feature-row:target h3, .commands > div:target dt code { color: #a5baff; }
 .commands > div[id] { scroll-margin-top: 1.5rem; }
 
-@media (max-width: 760px) {
-  .features-header { flex-direction: column; align-items: flex-start; }
-  .feature-layout { display: block; }
-  .feature-index {
-    position: static;
-    display: flex;
-    flex-wrap: wrap;
-    gap: .25rem .6rem;
-    margin: 0;
-    padding-block: .45rem;
-    border-bottom: 1px solid var(--line);
-  }
-  .feature-index a { min-height: 38px; padding: .2rem .35rem; border: 0; border-radius: .4rem; }
-  .feature-row > div:first-child { justify-content: flex-start; align-items: baseline; }
+@media (max-width: 900px) {
+  .feature-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 600px) {
+  .features-header { flex-direction: column; align-items: flex-start; gap: .4rem; }
+  .feature-list { grid-template-columns: minmax(0, 1fr); }
+  .feature-row { padding-block: 1.15rem .75rem; }
 }
 
 /* The banner's shortcut lands beneath the island without the extra section gap. */
