@@ -11,7 +11,8 @@
   <link rel="canonical" href="https://roblotracker.github.io/install/">
   <link rel="icon" type="image/webp" href="../assets/rt-logo.webp">
   <script src="../assets/page-progress.js?v=1" async></script>
-  <link rel="stylesheet" href="../assets/site.css?v=install-reasons">
+  <link rel="stylesheet" href="../assets/site.css?v=install-verify">
+  <script src="../assets/install.js?v=1" defer></script>
 </head>
 <body class="install-page">
   <a class="skip" href="#main">Skip to content</a>
@@ -33,24 +34,33 @@
     <section class="install-masthead" aria-labelledby="install-title">
       <div class="wrap install-intro">
         <img class="install-logo" src="../assets/rt-logo.webp" alt="" width="76" height="76">
-        <h1 id="install-title">Add RobloTracker to Discord</h1>
-        <p>Choose a server you manage to get alerts about Roblox activity and profile changes.</p>
-        <a class="button install-action" href="https://discord.com/oauth2/authorize?client_id=1561527919375814709&amp;permissions=268823568&amp;scope=bot%20applications.commands&amp;integration_type=0">
-          <img src="../assets/discord.svg" alt="" width="22" height="22">Continue to Discord
+        <h1 id="install-title">Add RobloTracker<br class="install-title-break"> to Discord</h1>
+        <p>Send public Roblox activity and profile updates to a channel in your Discord server.</p>
+        <a id="direct-install" class="button install-action" href="https://discord.com/oauth2/authorize?client_id=1561527919375814709&amp;permissions=268823568&amp;scope=bot%20applications.commands&amp;integration_type=0">
+          <img src="../assets/discord.svg" alt="" width="22" height="22">Choose a server on Discord
         </a>
+        <form id="install-verification" data-sitekey="" data-verifier="" hidden>
+          <div id="install-challenge"></div>
+          <p id="install-status" role="status"></p>
+          <button class="button install-action" type="submit" disabled>
+            <img src="../assets/discord.svg" alt="" width="22" height="22">Choose a server on Discord
+          </button>
+          <noscript>Enable JavaScript to complete the security check.</noscript>
+        </form>
+        <p class="install-permission">You’ll need Manage Server to add RT.</p>
       </div>
     </section>
     <section class="section wrap split install-guide" aria-labelledby="install-guide-title">
       <div class="section-intro">
-        <h2 id="install-guide-title">What you can do with RT</h2>
-        <p>Use a dedicated Discord channel to follow a Roblox profile’s public activity and recent changes.</p>
-        <p><a href="../#features">Explore tracking features</a></p>
+        <h2 id="install-guide-title">After you add RT</h2>
+        <p>Set up your first tracker in Discord.</p>
+        <p><a href="../#setup">See the full setup guide</a></p>
       </div>
-      <dl class="rows">
-        <div><dt>Add a profile</dt><dd>Run <code>/setup</code> to check server permissions, then <code>/track-account</code> to choose a profile and its alerts.</dd></div>
-        <div><dt>Control the pings</dt><dd>Use <code>/alerts settings</code> to pick which changes can ping your saved recipients.</dd></div>
-        <div><dt>Catch up later</dt><dd>Use <code>/user-history</code> to review delivered alerts for a tracked account.</dd></div>
-      </dl>
+      <ol class="steps install-steps">
+        <li><h3>Check permissions</h3><p>Run <code>/setup</code> to check that RT can create tracker channels.</p></li>
+        <li><h3>Add a Roblox profile</h3><p>Use <code>/track-account</code> with a Roblox username or ID.</p></li>
+        <li><h3>Choose who gets pinged</h3><p>Open <code>/alerts settings</code> to control which updates notify your team.</p></li>
+      </ol>
     </section>
   </main>
   <footer class="site-footer">

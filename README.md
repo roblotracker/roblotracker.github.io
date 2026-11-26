@@ -27,4 +27,13 @@ The publisher and systemd units are in `ops/`. The service runs as `ubuntu` and 
 
 ## Discord installation
 
-Use `https://roblotracker.github.io/install/` as the custom install link in the Discord Developer Portal. The site's Add buttons lead to this page. The page continues directly to Discord with the bot and slash-command scopes, the server installation context, and the same permission bitfield as the bot's `/invite` command. Keep the full authorization link on the page so it can open the Discord flow independently of the custom URL. This flow does not use an OAuth callback.
+Use `https://roblotracker.github.io/install/` as the custom install link in the Discord Developer Portal. The site's Add buttons lead to this page. The page continues to Discord with the bot and slash-command scopes, the server installation context, and the same permission bitfield as the bot's `/invite` command. The direct authorization link is used until CAPTCHA is activated. This flow does not use an OAuth callback.
+
+### Activate the install CAPTCHA
+
+1. In Cloudflare Turnstile, create a **Managed** widget for `roblotracker.github.io`.
+2. In `ops/install-verifier`, run `npx wrangler login`, then `npx wrangler deploy`. Run `npx wrangler secret put TURNSTILE_SECRET_KEY` and enter the widget secret when prompted. Use the Worker’s HTTPS URL ending in `/verify`.
+3. In `docs/install/index.html`, put the public widget key in `data-sitekey` and the HTTPS Worker URL in `data-verifier`. Remove the form’s `hidden` attribute and the `#direct-install` link in the same commit.
+4. After GitHub Pages deploys, open the install page and complete the check. Confirm the button opens the Discord server picker.
+
+The Worker accepts tokens only after Cloudflare verifies the widget action and site hostname. The site sends no bot credentials to Cloudflare. This protects the website’s install flow. Discord controls its own authorization links and app installs.

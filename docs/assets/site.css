@@ -447,6 +447,26 @@ section[id] { scroll-margin-top: 1.5rem; }
 }
 .install-intro p { max-width: 27rem; margin: 1.05rem auto 0; text-wrap: pretty; }
 .install-action { margin-top: 1.35rem; }
+.install-page .install-intro { padding-block: clamp(3rem, 7vw, 5.6rem); }
+.install-title-break { display: none; }
+.install-page .install-intro .install-permission {
+  margin-top: .8rem;
+  color: #cbd7ed;
+  font-size: .88rem;
+}
+#install-verification { margin-top: 1.4rem; }
+#install-challenge { width: min(100%, 304px); margin-inline: auto; }
+#install-status { font-size: .9rem; }
+#install-status:empty { display: none; }
+.install-action:disabled {
+  opacity: .65;
+  cursor: wait;
+}
+.install-guide .section-intro a { font-weight: 650; }
+.install-steps { margin: 0; }
+@media (min-width: 601px) {
+  .install-title-break { display: initial; }
+}
 
 
 @media (prefers-reduced-motion: no-preference) {
