@@ -10,8 +10,8 @@
   <title>RobloTracker | Roblox alerts for Discord</title>
   <link rel="icon" type="image/webp" href="assets/rt-logo.webp">
   <script src="assets/page-progress.js?v=1" async></script>
-  <link rel="stylesheet" href="assets/site.css?v=features-grid">
-  <script src="assets/site.js?v=features-grid" defer></script>
+  <link rel="stylesheet" href="assets/site.css?v=community">
+  <script src="assets/site.js?v=community" defer></script>
 </head>
 <body class="landing-page">
   <a class="skip" href="#main">Skip to content</a>
@@ -45,12 +45,12 @@
       <a class="hero-scroll" href="#features" aria-label="Scroll to features"></a>
     </section>
 
-    <section class="stats-strip" aria-labelledby="stats-title" data-snapshot-at="2026-11-25T20:19:34Z">
+    <section class="stats-strip" aria-label="RobloTracker usage" data-snapshot-at="2026-11-26T00:42:32Z">
       <div class="wrap stats-inner">
-        <div><h2 id="stats-title">RobloTracker in numbers</h2><p class="stats-status" role="status">Last verified snapshot <time datetime="2026-11-25T20:19:34Z">Nov 25, 2026 at 20:19 UTC</time></p></div>
         <dl class="stats-counts">
-          <div><dt>Roblox accounts tracked</dt><dd data-stat="tracked_accounts">33</dd></div>
-          <div><dt>Discord servers</dt><dd data-stat="discord_servers">12</dd></div>
+          <div><dt>Roblox accounts tracked</dt><dd data-stat="tracked_accounts">24</dd></div>
+          <div><dt>Discord servers</dt><dd data-stat="discord_servers">14</dd></div>
+          <div><dt>Support server members</dt><dd data-stat="support_members">17</dd></div>
         </dl>
       </div>
     </section>
@@ -136,10 +136,10 @@
       <div class="wrap split">
         <div class="section-intro"><h2 id="faq-title">Common questions</h2></div>
         <div class="faq">
-          <details><summary>Why is a friend list or game missing?</summary><p>Roblox sometimes sends only a friend count or a presence status. Your signed-in Roblox view may show details the public API leaves out.</p></details>
-          <details><summary>Why didn’t I get an alert right away?</summary><p>The first check gives RobloTracker a starting point. Later alerts depend on Roblox responding, the tracker’s cooldown, and whether RobloTracker can send to the Discord channel.</p></details>
-          <details><summary>Does RobloTracker need Administrator?</summary><p>The install requests specific permissions, including Manage Channels and Manage Roles for tracker setup. Review the channel’s access after setup.</p></details>
-          <details><summary>How do I remove my profile?</summary><p>Start with <code>/privacy remove</code> in a server that has RobloTracker or use the <a href="privacy.html#requests">removal guide</a>. For help or to report misuse, open a private support ticket.</p></details>
+          <details><summary>Why is a friend list or game missing?</summary><div class="faq-answer"><p>Roblox sometimes sends only a friend count or a presence status. Your signed-in Roblox view may show details the public API leaves out.</p></div></details>
+          <details><summary>Why didn’t I get an alert right away?</summary><div class="faq-answer"><p>The first check gives RobloTracker a starting point. Later alerts depend on Roblox responding, the tracker’s cooldown, and whether RobloTracker can send to the Discord channel.</p></div></details>
+          <details><summary>Does RobloTracker need Administrator?</summary><div class="faq-answer"><p>The install requests specific permissions, including Manage Channels and Manage Roles for tracker setup. Review the channel’s access after setup.</p></div></details>
+          <details><summary>How do I remove my profile?</summary><div class="faq-answer"><p>Start with <code>/privacy remove</code> in a server that has RobloTracker or use the <a href="privacy.html#requests">removal guide</a>. For help or to report misuse, open a private support ticket.</p></div></details>
         </div>
       </div>
     </section>
@@ -148,10 +148,22 @@
       <div class="section-intro">
         <h2 id="developers-title">Developers</h2>
       </div>
-      <dl class="rows developer-credits">
-        <div><dt>britishpersonal</dt><dd>Founder and Developer</dd></div>
-        <div><dt>delandaasianman</dt><dd>Developer and Founder’s Friend</dd></div>
-      </dl>
+      <ul class="developer-list" aria-label="RobloTracker developers">
+        <li class="developer-profile">
+          <img src="https://cdn.discordapp.com/avatars/1102219306588184657/a6693aeb3664289f50d1f164c21eb4b6.webp?size=128" alt="" width="64" height="64" loading="lazy">
+          <div><h3>britishpersonal</h3><p>Founder and developer of RobloTracker.</p></div>
+        </li>
+        <li class="developer-profile">
+          <img src="https://cdn.discordapp.com/avatars/750067843286171708/b65512207381da5b87036282e6576256.webp?size=128" alt="" width="64" height="64" loading="lazy">
+          <div><h3>delandaasianman</h3><p>RobloTracker developer and friend of the founder.</p></div>
+        </li>
+      </ul>
+      <template id="developer-profile-template">
+        <li class="developer-profile">
+          <img src="assets/rt-logo.webp" alt="" width="64" height="64" loading="lazy">
+          <div><h3></h3><p></p></div>
+        </li>
+      </template>
     </section>
 
     <section class="section wrap support" id="support" aria-labelledby="support-title">
@@ -178,7 +190,7 @@
   </main>
   <footer class="site-footer">
     <div class="wrap foot">
-      <div><a class="brand" href="./">RobloTracker</a><p>Independent Discord bot for public Roblox activity.</p></div>
+      <div><a class="brand" href="./">RobloTracker</a><p>© 2026–2027 RobloTracker</p></div>
       <nav aria-label="Footer navigation">
         <a href="#why-install">Why install?</a>
         <a href="#setup">Setup</a>

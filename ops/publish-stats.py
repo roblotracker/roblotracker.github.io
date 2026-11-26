@@ -1,4 +1,4 @@
-"""Publish the two aggregate bot counts to the isolated GitHub stats repository."""
+"""Publish website counts and public developer profiles to the isolated stats repository."""
 
 from datetime import datetime, timedelta, timezone
 import json
@@ -7,8 +7,10 @@ from pathlib import Path
 from shlex import join
 import subprocess
 import urllib.request
+from urllib.parse import urlsplit
 
 BOT_STATS = "http://127.0.0.1:8000/public-stats"
+BOT_COMMUNITY = "http://127.0.0.1:8000/site-community"
 GITHUB_REMOTE = "ssh://git@ssh.github.com:443/Duncanmmm123/roblotracker-stats.git"
 FIELDS = ("tracked_accounts", "discord_servers")
 HEARTBEAT = timedelta(minutes=5)
@@ -40,16 +42,38 @@ def git(*args: str, cwd: Path = checkout, capture: bool = False) -> str:
     return (result.stdout or "").strip()
 
 
-def read_counts() -> dict[str, int]:
+def read_bot_json(url: str, *, limit: int, timeout: int):
     opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
-    with opener.open(BOT_STATS, timeout=5) as response:
-        raw = json.loads(response.read(4096))
+    with opener.open(url, timeout=timeout) as response:
+        return json.loads(response.read(limit))
+
+
+def read_counts() -> dict[str, int]:
+    raw = read_bot_json(BOT_STATS, limit=4096, timeout=5)
     if not isinstance(raw, dict) or any(type(raw.get(key)) is not int or not 0 <= raw[key] <= 2**53 - 1 for key in FIELDS):
         raise ValueError("Invalid count format")
     return {key: raw[key] for key in FIELDS}
 
 
-def recent_snapshot(path: Path, counts: dict[str, int], now: datetime) -> bool:
+def read_community() -> dict:
+    raw = read_bot_json(BOT_COMMUNITY, limit=64 * 1024, timeout=10)
+    count = raw.get("support_members") if isinstance(raw, dict) else None
+    developers = raw.get("developers") if isinstance(raw, dict) else None
+    if type(count) is not int or not 0 <= count <= 2**53 - 1 or not isinstance(developers, list):
+        raise ValueError("Invalid community format")
+    profiles = []
+    for profile in developers:
+        name, avatar = profile["username"], profile["avatar"]
+        if not isinstance(name, str) or not 1 <= len(name) <= 32 or not isinstance(avatar, str):
+            raise ValueError("Invalid developer profile")
+        parts = urlsplit(avatar)
+        if parts.scheme != "https" or parts.netloc != "cdn.discordapp.com":
+            raise ValueError("Unexpected developer avatar host")
+        profiles.append({"username": name, "avatar": avatar})
+    return {"support_members": count, "developers": profiles}
+
+
+def recent_snapshot(path: Path, counts: dict, now: datetime) -> bool:
     try:
         current = json.loads(path.read_text(encoding="utf-8"))
         stamp = datetime.fromisoformat(current["updated_at"].replace("Z", "+00:00"))
@@ -72,6 +96,15 @@ def main() -> None:
         raise RuntimeError("Unexpected stats repository remote")
     snapshot = checkout / "public-stats.json"
     now = datetime.now(timezone.utc)
+    try:
+        counts.update(read_community())
+    except (OSError, ValueError, TypeError, KeyError):
+        print("Support community unavailable. Kept its last verified snapshot.")
+        try:
+            last = json.loads(snapshot.read_text(encoding="utf-8"))
+            counts.update({key: last[key] for key in ("support_members", "developers") if key in last})
+        except (OSError, ValueError, TypeError):
+            pass
     if recent_snapshot(snapshot, counts, now) and not git("rev-list", "origin/main..HEAD", capture=True):
         print("The published counts are current.")
         return
@@ -85,7 +118,7 @@ def main() -> None:
 
     if git("rev-list", "origin/main..HEAD", capture=True):
         git("push", "--quiet", "origin", "HEAD:main")
-        print("Published anonymous tracker totals.")
+        print("Published website stats and developer roster.")
     else:
         print("The published counts are current.")
 

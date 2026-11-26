@@ -11,14 +11,57 @@
     update();
   }
 
+  document.querySelectorAll(".faq details").forEach(details => {
+    const question = details.querySelector("summary");
+    const answer = details.querySelector(".faq-answer");
+    let slide;
+    let opening = false;
+
+    question.addEventListener("click", event => {
+      if (!answer.animate) return;
+      if (motion.matches) {
+        if (slide) {
+          slide.cancel();
+          slide = null;
+          answer.style.overflow = "";
+          details.open = opening;
+          details.classList.remove("is-closing");
+        }
+        return;
+      }
+      event.preventDefault();
+      const height = answer.getBoundingClientRect().height;
+      opening = slide ? !opening : !details.open;
+      slide?.cancel();
+      details.open = true;
+      details.classList.toggle("is-closing", !opening);
+      answer.style.overflow = "hidden";
+      slide = answer.animate(
+        [{ height: `${height}px`, opacity: height ? 1 : 0 }, { height: `${opening ? answer.scrollHeight : 0}px`, opacity: opening ? 1 : 0 }],
+        { duration: 220, easing: "ease-in-out" },
+      );
+      slide.onfinish = () => {
+        details.open = opening;
+        details.classList.remove("is-closing");
+        answer.style.overflow = "";
+        slide = null;
+      };
+    });
+  });
+
   const stats = document.querySelector(".stats-strip");
   if (!stats) return;
-  const status = stats.querySelector(".stats-status");
   const fields = Array.from(stats.querySelectorAll("[data-stat]"));
   const format = new Intl.NumberFormat();
+  const developerList = document.querySelector(".developer-list");
+  const developerTemplate = document.querySelector("#developer-profile-template");
+  const developerBios = new Map([
+    ["britishpersonal", "Founder and developer of RobloTracker."],
+    ["delandaasianman", "RobloTracker developer and friend of the founder."],
+  ]);
+  let currentRoster;
 
   const refreshMs = 120_000;
-  const dateFormat = new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" });
   let latest = Date.parse(stats.dataset.snapshotAt);
   let config;
   let loading = false;
@@ -42,13 +85,29 @@
     }
   }
 
-  function setStatus(label) {
-    const iso = new Date(latest).toISOString();
-    if (status.firstChild?.nodeValue === label && status.querySelector("time")?.dateTime === iso) return;
-    const time = document.createElement("time");
-    time.dateTime = iso;
-    time.textContent = dateFormat.format(latest);
-    status.replaceChildren(label, time);
+  function showDevelopers(roster) {
+    if (!developerList || !developerTemplate || !Array.isArray(roster)) return;
+    const entries = [];
+    for (const profile of roster) {
+      if (!profile || typeof profile.username !== "string" || typeof profile.avatar !== "string") return;
+      if (!/^https:\/\/cdn\.discordapp\.com\/(?:avatars|guilds|embed\/avatars)\//.test(profile.avatar)) return;
+      const entry = developerTemplate.content.cloneNode(true);
+      const avatar = entry.querySelector("img");
+      avatar.addEventListener("error", () => { avatar.src = "assets/rt-logo.webp"; }, { once: true });
+      avatar.src = profile.avatar;
+      entry.querySelector("h3").textContent = profile.username;
+      entry.querySelector("p").textContent = developerBios.get(profile.username) ?? "RobloTracker developer.";
+      entries.push(entry);
+    }
+    const key = JSON.stringify(roster);
+    if (key === currentRoster) return;
+    currentRoster = key;
+    if (!entries.length) {
+      const empty = document.createElement("li");
+      empty.textContent = "No developers are currently listed.";
+      entries.push(empty);
+    }
+    developerList.replaceChildren(...entries);
   }
 
   async function getTotals(endpoint, accept, now) {
@@ -59,7 +118,7 @@
     const stamp = Date.parse(totals?.updated_at);
     const age = now - stamp;
     if (!Number.isFinite(age) || age < -300_000 || age > 1_200_000 || stamp < latest ||
-        !fields.every(node => Number.isSafeInteger(totals[node.dataset.stat]) && totals[node.dataset.stat] >= 0)) {
+        !["tracked_accounts", "discord_servers"].every(key => Number.isSafeInteger(totals[key]) && totals[key] >= 0)) {
       throw new Error("Invalid or stale stats");
     }
     return { totals, stamp };
@@ -83,7 +142,9 @@
       }
       const { totals, stamp } = data;
       fields.forEach(node => {
-        const formatted = format.format(totals[node.dataset.stat]);
+        const value = totals[node.dataset.stat];
+        if (!Number.isSafeInteger(value) || value < 0) return;
+        const formatted = format.format(value);
         if (node.textContent === formatted) return;
         node.textContent = formatted;
         const rect = node.getBoundingClientRect();
@@ -94,11 +155,10 @@
           );
         }
       });
+      showDevelopers(totals.developers);
       latest = stamp;
-      setStatus("Last checked ");
     } catch {
-      // Keep the last validated values and their timestamp.
-      setStatus("Last verified snapshot ");
+      // Keep the last validated numbers and developer roster.
     } finally {
       loading = false;
     }
