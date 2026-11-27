@@ -1,6 +1,8 @@
 const api = "https://roblotracker-tracker-dashboard.install-verifier.workers.dev";
 const snowflake = /^[1-9][0-9]{16,18}$/;
 const storageKey = "rt-dashboard-session";
+const oauthKey = "rt-dashboard-oauth";
+const proofPattern = /^[a-f0-9]{64}$/;
 const byId = id => document.getElementById(id);
 const status = byId("dashboard-status");
 const commandInput = byId("pair-command");
@@ -29,9 +31,18 @@ function setToken(value) {
   }
 }
 
-function currentChannel() {
+function currentRoute() {
   const hash = location.hash.slice(1);
-  return snowflake.test(hash) ? hash : null;
+  if (snowflake.test(hash)) return { channel: hash, guild: null };
+  const params = new URLSearchParams(hash);
+  const channel = params.get("tracker");
+  const guild = params.get("server");
+  return { channel: snowflake.test(channel) ? channel : null, guild: snowflake.test(guild) ? guild : null };
+}
+
+function serverRoute(guild, channel = null) {
+  if (!guild) return channel ? `#${channel}` : "#";
+  return `#server=${guild}${channel ? `&tracker=${channel}` : ""}`;
 }
 
 async function post(path, data = {}, authorization = token) {
@@ -52,8 +63,9 @@ async function post(path, data = {}, authorization = token) {
 }
 
 function showPanel(panel) {
-  for (const id of ["access", "index", "detail", "denied"]) byId(id).hidden = id !== panel;
+  for (const id of ["access", "servers", "index", "detail", "denied"]) byId(id).hidden = id !== panel;
   byId("lock").hidden = !token;
+  if (panel !== "servers") byId("server-list").replaceChildren();
   if (panel !== "index") {
     trackers = [];
     byId("tracker-list").replaceChildren();
@@ -64,6 +76,20 @@ function showPanel(panel) {
     byId("account-image").src = "../assets/rt-logo.webp";
     byId("activity-list").replaceChildren();
   }
+}
+
+function renderViewer(viewer, panel, guild) {
+  const account = byId("viewer");
+  account.hidden = !viewer;
+  byId("viewer-name").textContent = viewer?.name || "";
+  byId("viewer-avatar").src = viewer?.avatar || "../assets/discord.svg";
+  byId("lock").textContent = viewer ? "Sign out" : "Lock";
+  const serversBack = byId("servers-back");
+  serversBack.hidden = !viewer || panel === "servers" || !panel;
+  const trackersBack = byId("trackers-back");
+  trackersBack.hidden = panel !== "detail";
+  trackersBack.href = serverRoute(viewer ? guild : null);
+  byId("workspace-nav").hidden = serversBack.hidden && trackersBack.hidden;
 }
 
 function timeText(value) {
@@ -83,15 +109,47 @@ function linkRow(text, secondary, href, time = false) {
   return li;
 }
 
+function renderServers(servers) {
+  const entries = (servers || []).filter(server => snowflake.test(server.id))
+    .sort((left, right) => left.name.localeCompare(right.name));
+  byId("server-list").replaceChildren(...entries.map(server => {
+    const item = document.createElement("li");
+    const link = document.createElement("a");
+    const icon = document.createElement("img");
+    const name = document.createElement("span");
+    const arrow = document.createElement("span");
+    link.href = serverRoute(server.id);
+    icon.src = server.icon || "../assets/rt-logo.webp";
+    icon.alt = "";
+    icon.width = 38;
+    icon.height = 38;
+    icon.addEventListener("error", () => { icon.src = "../assets/rt-logo.webp"; }, { once: true });
+    name.textContent = server.name;
+    arrow.textContent = "→";
+    arrow.setAttribute("aria-hidden", "true");
+    link.append(icon, name, arrow);
+    item.append(link);
+    return item;
+  }));
+  byId("servers-empty").hidden = entries.length !== 0;
+}
+
 function renderIndex() {
+  const guild = currentRoute().guild;
   const filter = search.value.trim().toLowerCase().replace(/^@/, "");
   const matching = trackers.filter(item => snowflake.test(item.channel) &&
     [item.username, item.name].some(value => String(value).toLowerCase().includes(filter)));
   byId("tracker-list").replaceChildren(...matching.map(item =>
-    linkRow(`@${item.username}`, item.paused ? "Paused" : item.name, `#${item.channel}`)));
+    linkRow(`@${item.username}`, item.paused ? "Paused" : item.name, serverRoute(guild, item.channel))));
   byId("index-empty").hidden = matching.length > 0;
   byId("index-empty").textContent = trackers.length ? "No trackers match your search." : "You don’t have access to any tracker channels in this server.";
 }
+
+const signalLabels = {
+  presence: "Status change", avatar_appearance: "Outfit change", avatar_url: "Avatar change",
+  friends: "Friend list change", friends_count: "Friend count change",
+  username: "Username change", display_name: "Display name change", description: "Bio change",
+};
 
 function renderDetail(tracker) {
   byId("account-name").textContent = tracker.name || tracker.username;
@@ -107,7 +165,7 @@ function renderDetail(tracker) {
   const events = (tracker.activity || []).filter(event =>
     /^https:\/\/discord\.com\/channels\/\d+\/\d+\/\d+$/.test(event.link || ""));
   byId("activity-list").replaceChildren(...events.map(event => linkRow(
-    (event.kind || "Update").replaceAll("_", " ").replace(/^./, letter => letter.toUpperCase()),
+    signalLabels[event.kind] || (event.kind || "Update").replaceAll("_", " ").replace(/^./, letter => letter.toUpperCase()),
     timeText(event.when), event.link, true,
   )));
   byId("activity-empty").hidden = events.length > 0;
@@ -120,6 +178,7 @@ function locked(message) {
   byId("pairing").hidden = true;
   byId("pair").hidden = false;
   showPanel("access");
+  renderViewer(null);
   status.textContent = message;
 }
 
@@ -131,18 +190,20 @@ async function refresh() {
   }
   inFlight = true;
   const requestGeneration = generation;
-  const channel = currentChannel();
+  const route = currentRoute();
+  const routeHash = location.hash;
   try {
-    const result = await post("/view", { channel });
-    if (generation !== requestGeneration || channel !== currentChannel() || document.hidden) return;
+    const result = await post("/view", route);
+    if (generation !== requestGeneration || routeHash !== location.hash || document.hidden) return;
     if (result.state === "expired") return locked("This session expired. Get a new code to continue.");
-    const marker = `${channel || ""}:${result.state}:${result.updated || ""}`;
+    const marker = `${routeHash}:${result.state}:${result.updated || ""}`;
     if (rendered === marker) return;
     rendered = marker;
     if (result.state === "pending") {
       showPanel("access");
       byId("pair").hidden = true;
       byId("pairing").hidden = false;
+      byId("code-access").open = true;
       commandInput.value = result.code;
       status.textContent = "Waiting for Discord to approve this browser.";
     } else if (result.state === "ready" && result.data) {
@@ -150,13 +211,22 @@ async function refresh() {
       if (result.data.tracker) {
         showPanel("detail");
         renderDetail(result.data.tracker);
+        renderViewer(result.viewer, "detail", result.data.server?.id);
+      } else if (result.data.servers) {
+        showPanel("servers");
+        renderServers(result.data.servers);
+        renderViewer(result.viewer, "servers");
       } else {
         showPanel("index");
+        byId("tracker-server").textContent = result.data.server?.name || "";
         trackers = result.data.trackers || [];
         renderIndex();
+        renderViewer(result.viewer, "index");
       }
     } else {
-      showPanel(result.state === "denied" ? "denied" : null);
+      const panel = result.state === "denied" ? "denied" : null;
+      showPanel(panel);
+      renderViewer(result.viewer, panel);
       status.textContent = result.state === "denied" ? "This channel couldn’t be verified." : "Checking your Discord access…";
     }
   } catch {
@@ -178,7 +248,7 @@ byId("pair").addEventListener("click", async event => {
   const button = event.currentTarget;
   button.disabled = true;
   try {
-    const result = await post("/pair", { channel: currentChannel() }, null);
+    const result = await post("/pair", { channel: currentRoute().channel }, null);
     setToken(result.token);
     await refresh();
   } catch {
@@ -187,6 +257,59 @@ byId("pair").addEventListener("click", async event => {
     button.disabled = false;
   }
 });
+
+byId("sign-in").addEventListener("click", async event => {
+  const button = event.currentTarget;
+  button.disabled = true;
+  try {
+    const result = await post("/oauth/start", {}, null);
+    const address = new URL(result.url);
+    if (address.origin !== "https://discord.com" || address.pathname !== "/oauth2/authorize" ||
+        !proofPattern.test(result.proof)) throw new Error("Invalid Discord sign-in request");
+    sessionStorage.setItem(oauthKey, JSON.stringify({ proof: result.proof, hash: location.hash }));
+    location.assign(address.href);
+  } catch {
+    status.textContent = "Couldn’t start Discord sign-in. Try again or use a one-time code.";
+    button.disabled = false;
+  }
+});
+
+async function finishSignIn() {
+  const handoff = new URLSearchParams(location.hash.slice(1)).get("oauth");
+  if (handoff === null) return;
+  let saved;
+  try {
+    saved = JSON.parse(sessionStorage.getItem(oauthKey) || "null");
+    sessionStorage.removeItem(oauthKey);
+  } catch {
+    saved = null;
+  }
+  const fallbackHash = saved?.hash?.startsWith("#") && !saved.hash.startsWith("#oauth=") ? saved.hash : "";
+  history.replaceState(null, "", location.pathname + fallbackHash);
+  if (!proofPattern.test(handoff) || !proofPattern.test(saved?.proof || "")) {
+    status.textContent = "Discord sign-in didn’t finish. Try again or use a one-time code.";
+    return;
+  }
+  try {
+    const result = await post("/oauth/finish", { handoff, proof: saved.proof }, null);
+    if (!proofPattern.test(result.token || "")) throw new Error("Session was not created");
+    setToken(result.token);
+  } catch {
+    status.textContent = "Discord sign-in expired. Try again or use a one-time code.";
+  }
+}
+
+async function showSignInOptions() {
+  try {
+    const result = await post("/capabilities", {}, null);
+    byId("sign-in").hidden = !result.discordSignIn;
+    byId("oauth-unavailable").hidden = Boolean(result.discordSignIn);
+    if (!result.discordSignIn) byId("code-access").open = true;
+  } catch {
+    byId("oauth-unavailable").hidden = false;
+    byId("code-access").open = true;
+  }
+}
 
 byId("lock").addEventListener("click", () => {
   const previous = token;
@@ -205,6 +328,10 @@ byId("copy").addEventListener("click", async () => {
 byId("account-image").addEventListener("error", event => {
   const image = event.currentTarget;
   if (!image.src.endsWith("/rt-logo.webp")) image.src = "../assets/rt-logo.webp";
+});
+byId("viewer-avatar").addEventListener("error", event => {
+  const image = event.currentTarget;
+  if (!image.src.endsWith("/discord.svg")) image.src = "../assets/discord.svg";
 });
 search.addEventListener("input", renderIndex);
 window.addEventListener("hashchange", () => {
@@ -238,7 +365,6 @@ document.addEventListener("visibilitychange", () => {
   }
 });
 window.setInterval(() => { if (!document.hidden) refresh(); }, 5000);
-if (token) {
-  showPanel(null);
-  refresh();
-}
+await finishSignIn();
+showSignInOptions();
+if (token) { showPanel(null); refresh(); }

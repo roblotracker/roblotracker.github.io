@@ -6,52 +6,92 @@
   <meta name="robots" content="noindex,nofollow">
   <meta name="referrer" content="no-referrer">
   <meta name="theme-color" content="#0e1119">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://roblotracker-tracker-dashboard.install-verifier.workers.dev; img-src 'self' https://*.rbxcdn.com https://rbxcdn.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://roblotracker-tracker-dashboard.install-verifier.workers.dev; img-src 'self' https://*.rbxcdn.com https://rbxcdn.com https://cdn.discordapp.com; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>Tracker dashboard | RobloTracker</title>
   <link rel="icon" href="../assets/rt-logo.webp" type="image/webp">
   <link rel="stylesheet" href="../assets/site.css?v=install-verify">
-  <link rel="stylesheet" href="../assets/dashboard.css">
-  <script src="../assets/dashboard.js" type="module"></script>
+  <link rel="stylesheet" href="../assets/dashboard.css?v=workspace">
+  <script src="../assets/dashboard.js?v=workspace" type="module"></script>
 </head>
-<body class="install-page">
+<body class="dashboard-page">
+  <a class="skip" href="#content">Skip to dashboard</a>
   <header class="site-header">
     <div class="wrap top">
       <a class="brand" href="../"><img src="../assets/rt-logo.webp" width="34" height="34" alt="">RobloTracker</a>
-      <button id="lock" class="button small secondary" type="button" hidden>Lock dashboard</button>
+      <div class="dashboard-nav">
+        <a class="dashboard-home" href="../">Main site</a>
+        <div id="viewer" class="viewer-chip" hidden>
+          <img id="viewer-avatar" src="../assets/discord.svg" width="26" height="26" alt="">
+          <span id="viewer-name"></span>
+        </div>
+        <button id="lock" class="button small secondary" type="button" hidden>Sign out</button>
+      </div>
     </div>
   </header>
-  <main class="wrap dashboard">
-    <h1 id="page-title">Tracker dashboard</h1>
-    <p id="dashboard-status" role="status">Your dashboard is locked.</p>
+  <main class="wrap dashboard" id="content">
+    <header class="dashboard-hero">
+      <h1 id="page-title">Tracker dashboard</h1>
+      <p>Browse your servers and see the latest activity from your trackers.</p>
+    </header>
+    <div class="workspace-bar">
+      <nav aria-label="Dashboard navigation" id="workspace-nav" hidden>
+        <a href="#" id="servers-back" hidden>Servers</a>
+        <a href="#" id="trackers-back" hidden>Trackers</a>
+      </nav>
+      <p id="dashboard-status" role="status">Your dashboard is locked.</p>
+    </div>
     <section id="access" class="dashboard-panel" aria-labelledby="access-title">
-      <h2 id="access-title">Unlock with Discord</h2>
-      <p>Open the Discord server where you got the alert. Use the code from this browser to verify your access.</p>
-      <button id="pair" type="button" class="button">Get a code</button>
-      <div id="pairing" hidden>
-        <label for="pair-command">Paste this code into <code>/tracker-dashboard</code> in Discord</label>
-        <div class="pair-row">
-          <input id="pair-command" type="text" readonly spellcheck="false">
-          <button id="copy" type="button" class="button secondary">Copy code</button>
-        </div>
-        <p class="dashboard-note">Keep this tab open. Only use a code you created yourself.</p>
+      <div class="access-content">
+        <h2 id="access-title">Connect your Discord account</h2>
+        <p>See the servers you share with RobloTracker and the tracker channels you can read.</p>
+        <button id="sign-in" class="button" type="button" hidden><img src="../assets/discord.svg" width="20" height="20" alt=""> Sign in with Discord</button>
+        <p id="oauth-unavailable" class="dashboard-note" hidden>Discord sign-in is currently unavailable. You can still unlock a server with a code.</p>
+        <details id="code-access">
+          <summary>Use a one-time code</summary>
+          <p>Open the Discord server where you got the alert, then run <code>/tracker-dashboard</code> with your browser code.</p>
+          <button id="pair" type="button" class="button secondary">Get a code</button>
+          <div id="pairing" hidden>
+            <label for="pair-command">Paste this code into <code>/tracker-dashboard</code></label>
+            <div class="pair-row">
+              <input id="pair-command" type="text" readonly spellcheck="false">
+              <button id="copy" type="button" class="button secondary">Copy code</button>
+            </div>
+            <p class="dashboard-note">Keep this tab open. Only use a code you created yourself.</p>
+          </div>
+        </details>
+        <noscript><p>Enable JavaScript to unlock the dashboard.</p></noscript>
       </div>
-      <noscript><p>Enable JavaScript to unlock the dashboard.</p></noscript>
+    </section>
+    <section id="servers" class="dashboard-panel" aria-labelledby="servers-title" hidden>
+      <h2 id="servers-title">Your servers</h2>
+      <p>Choose a server to see its trackers.</p>
+      <ul id="server-list" class="server-list"></ul>
+      <div id="servers-empty" hidden>
+        <p>You don’t share any tracking servers with RobloTracker yet.</p>
+        <a href="../install/" class="button secondary">Add to Discord</a>
+      </div>
     </section>
     <section id="index" class="dashboard-panel" aria-labelledby="index-title" hidden>
-      <h2 id="index-title">Your trackers</h2>
-      <label for="search">Find a Roblox account</label>
-      <input id="search" type="search" placeholder="Username or display name" autocomplete="off">
+      <div class="tracker-toolbar">
+        <div>
+          <p id="tracker-server" class="dashboard-note"></p>
+          <h2 id="index-title">Your trackers</h2>
+        </div>
+        <div class="tracker-search">
+          <label for="search">Find a Roblox account</label>
+          <input id="search" type="search" placeholder="Username or display name" autocomplete="off">
+        </div>
+      </div>
       <ul id="tracker-list" class="tracker-list"></ul>
       <p id="index-empty" hidden>No trackers match your search.</p>
     </section>
     <section id="detail" aria-labelledby="account-name" hidden>
-      <a class="dashboard-back" href="#">← All trackers</a>
       <div class="dashboard-panel profile-panel">
         <img id="account-image" src="../assets/rt-logo.webp" width="80" height="80" alt="">
         <div>
           <h2 id="account-name"></h2>
           <p id="account-handle"></p>
-          <a id="account-profile" rel="noreferrer">Roblox profile ↗</a>
+          <a id="account-profile" rel="noreferrer">Roblox profile <span aria-hidden="true">↗</span></a>
         </div>
         <span id="account-state" class="account-state"></span>
       </div>

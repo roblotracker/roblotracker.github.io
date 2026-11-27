@@ -37,3 +37,13 @@ Use `https://roblotracker.github.io/install/` as the custom install link in the 
 4. After GitHub Pages deploys, open the install page and complete the check. Confirm the button opens the Discord server picker.
 
 The Worker accepts tokens only after Cloudflare verifies the widget action and site hostname. The site sends no bot credentials to Cloudflare. This protects the website’s install flow. Discord controls its own authorization links and app installs.
+
+## Private dashboard Discord sign-in
+
+In the RobloTracker application’s OAuth2 settings, register
+`https://roblotracker-tracker-dashboard.install-verifier.workers.dev/oauth/callback`
+as a redirect. In `ops/tracker-dashboard` run `npx wrangler secret put DISCORD_CLIENT_SECRET`
+and paste the application’s OAuth2 client secret at the prompt. Keep the secret
+out of the repository. The dashboard requests only Discord’s `identify` and
+`guilds` scopes. The bot verifies membership and tracker channel permissions
+before returning tracker data. One-time Discord codes remain available.
