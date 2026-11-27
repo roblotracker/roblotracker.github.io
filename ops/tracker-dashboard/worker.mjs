@@ -11,6 +11,7 @@ const sessionLifetime = 20 * 60_000;
 const refreshAge = 12_000;
 const maximumAge = 24_000;
 const maxSessions = 300;
+const sessionDirectory = "tracker-sessions-profile";
 const headers = {
   "Cache-Control": "no-store",
   "X-Content-Type-Options": "nosniff",
@@ -74,7 +75,7 @@ export default {
     const path = new URL(request.url).pathname;
     if (path === "/oauth/callback") {
       if (request.method !== "GET") return reply({ error: "method_not_allowed" }, 405);
-      return env.DASHBOARD.get(env.DASHBOARD.idFromName("tracker-sessions")).fetch(request);
+      return env.DASHBOARD.get(env.DASHBOARD.idFromName(sessionDirectory)).fetch(request);
     }
     if (botRoutes.has(path)) {
       const expected = env.DASHBOARD_BOT_KEY;
@@ -95,7 +96,7 @@ export default {
       return reply({ error: "not_found" }, 404);
     }
     if (request.method !== "POST") return reply({ error: "method_not_allowed" }, 405);
-    return env.DASHBOARD.get(env.DASHBOARD.idFromName("tracker-sessions")).fetch(request);
+    return env.DASHBOARD.get(env.DASHBOARD.idFromName(sessionDirectory)).fetch(request);
   },
 };
 

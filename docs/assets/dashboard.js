@@ -202,6 +202,7 @@ async function refresh() {
     rendered = marker;
     if (result.state === "pending") {
       showPanel("access");
+      renderViewer(null);
       byId("pair").hidden = true;
       byId("pairing").hidden = false;
       byId("code-access").open = true;
