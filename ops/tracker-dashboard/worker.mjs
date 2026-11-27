@@ -40,6 +40,17 @@ function oauthReturn(value) {
   });
 }
 
+function approvedViewer(viewer) {
+  if (!viewer || typeof viewer.name !== "string" || !viewer.name.trim()) return null;
+  return {
+    name: viewer.name.trim().slice(0, 80),
+    username: typeof viewer.username === "string" ? viewer.username.slice(0, 40) : "",
+    avatar: typeof viewer.avatar === "string" &&
+      /^https:\/\/cdn\.discordapp\.com\/(?:avatars|embed\/avatars)\/[A-Za-z0-9_/.-]+(?:\?size=64)?$/.test(viewer.avatar)
+      ? viewer.avatar : null,
+  };
+}
+
 async function body(request) {
   if (!request.body) return {};
   const reader = request.body.getReader();
@@ -180,7 +191,9 @@ export class DashboardSessions {
       if (!session || session.expires <= Date.now()) return reply({ error: "invalid_code" }, 404);
       this.codes.delete(input.code);
       session.code = null;
-      session.guild = input.guild;
+      session.viewer = approvedViewer(input.viewer);
+      session.guild = session.viewer ? null : input.guild;
+      session.discover = Boolean(session.viewer);
       session.member = input.member;
       session.expires = now + sessionLifetime;
       session.views = new Map();
@@ -195,7 +208,7 @@ export class DashboardSessions {
           view.job = randomHex(16);
           view.leaseUntil = now + 15_000;
           jobs.push({ job: view.job, guild: view.guild, member: session.member, channel: view.channel,
-            guilds: session.guilds || null });
+            guilds: session.guilds || null, discover: Boolean(session.discover) });
           if (jobs.length === 8) break queue;
         }
       }
@@ -229,8 +242,9 @@ export class DashboardSessions {
       return reply({ error: "invalid_channel" }, 400);
     }
     let guild = session.guild || null;
-    if (session.guilds && input.guild != null) {
-      if (typeof input.guild !== "string" || !session.guilds.includes(input.guild)) {
+    if ((session.guilds || session.discover) && input.guild != null) {
+      if (typeof input.guild !== "string" || !snowflake.test(input.guild) ||
+          (session.guilds && !session.guilds.includes(input.guild))) {
         return reply({ state: "denied", viewer: session.viewer });
       }
       guild = input.guild;
@@ -241,8 +255,9 @@ export class DashboardSessions {
     session.views.set(viewKey, view);
     if (session.views.size > 8) session.views.delete(session.views.keys().next().value);
     const age = now - (view.updated || 0);
-    if (age >= refreshAge) view.wanted = now;
-    if (age >= maximumAge) return reply({ state: "loading", viewer: session.viewer });
+    const serverDirectory = !guild && !channel;
+    if (age >= (serverDirectory ? 45_000 : refreshAge)) view.wanted = now;
+    if (age >= (serverDirectory ? 60_000 : maximumAge)) return reply({ state: "loading", viewer: session.viewer });
     return reply({ state: view.data ? "ready" : "denied", viewer: session.viewer, updated: view.updated, data: view.data });
   }
 }

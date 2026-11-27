@@ -11,7 +11,7 @@
   <link rel="icon" href="../assets/rt-logo.webp" type="image/webp">
   <link rel="stylesheet" href="../assets/site.css?v=install-verify">
   <link rel="stylesheet" href="../assets/dashboard.css?v=workspace">
-  <script src="../assets/dashboard.js?v=workspace" type="module"></script>
+  <script src="../assets/dashboard.js?v=profile-signin" type="module"></script>
 </head>
 <body class="dashboard-page">
   <a class="skip" href="#content">Skip to dashboard</a>
@@ -45,16 +45,17 @@
         <h2 id="access-title">Connect your Discord account</h2>
         <p>See the servers you share with RobloTracker and the tracker channels you can read.</p>
         <button id="sign-in" class="button" type="button" hidden><img src="../assets/discord.svg" width="20" height="20" alt=""> Sign in with Discord</button>
-        <p id="oauth-unavailable" class="dashboard-note" hidden>Discord sign-in is currently unavailable. You can still unlock a server with a code.</p>
+        <p id="oauth-unavailable" class="dashboard-note" hidden>Use Discord verification to load your profile and shared servers.</p>
         <details id="code-access">
           <summary>Use a one-time code</summary>
-          <p>Open the Discord server where you got the alert, then run <code>/tracker-dashboard</code> with your browser code.</p>
-          <button id="pair" type="button" class="button secondary">Get a code</button>
+          <p>Run <code>/tracker-dashboard</code> with the code below in any server where you use RobloTracker.</p>
+          <button id="pair" type="button" class="button secondary">Get verification code</button>
           <div id="pairing" hidden>
             <label for="pair-command">Paste this code into <code>/tracker-dashboard</code></label>
             <div class="pair-row">
               <input id="pair-command" type="text" readonly spellcheck="false">
               <button id="copy" type="button" class="button secondary">Copy code</button>
+              <a class="button secondary" href="https://discord.com/channels/@me" target="_blank" rel="noopener noreferrer">Open Discord</a>
             </div>
             <p class="dashboard-note">Keep this tab open. Only use a code you created yourself.</p>
           </div>

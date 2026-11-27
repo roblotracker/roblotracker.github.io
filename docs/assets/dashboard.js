@@ -82,6 +82,7 @@ function renderViewer(viewer, panel, guild) {
   const account = byId("viewer");
   account.hidden = !viewer;
   byId("viewer-name").textContent = viewer?.name || "";
+  account.title = viewer?.username ? `Discord · @${viewer.username}` : "";
   byId("viewer-avatar").src = viewer?.avatar || "../assets/discord.svg";
   byId("lock").textContent = viewer ? "Sign out" : "Lock";
   const serversBack = byId("servers-back");
@@ -205,7 +206,7 @@ async function refresh() {
       byId("pairing").hidden = false;
       byId("code-access").open = true;
       commandInput.value = result.code;
-      status.textContent = "Waiting for Discord to approve this browser.";
+      status.textContent = "After you enter your code in Discord, your profile will load here automatically.";
     } else if (result.state === "ready" && result.data) {
       status.textContent = `Updated ${timeText(result.updated)}`;
       if (result.data.tracker) {
@@ -304,11 +305,16 @@ async function showSignInOptions() {
     const result = await post("/capabilities", {}, null);
     byId("sign-in").hidden = !result.discordSignIn;
     byId("oauth-unavailable").hidden = Boolean(result.discordSignIn);
-    if (!result.discordSignIn) byId("code-access").open = true;
+    if (!result.discordSignIn) showCodeSignIn();
   } catch {
     byId("oauth-unavailable").hidden = false;
-    byId("code-access").open = true;
+    showCodeSignIn();
   }
+}
+
+function showCodeSignIn() {
+  byId("code-access").open = true;
+  byId("pair").classList.remove("secondary");
 }
 
 byId("lock").addEventListener("click", () => {
