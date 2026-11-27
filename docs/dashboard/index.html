@@ -10,13 +10,13 @@
   <title>Tracker dashboard | RobloTracker</title>
   <link rel="icon" href="../assets/rt-logo.webp" type="image/webp">
   <link rel="stylesheet" href="../assets/site.css?v=install-verify">
-  <link rel="stylesheet" href="../assets/dashboard.css?v=workspace">
-  <script src="../assets/dashboard.js?v=profile-signin-2" type="module"></script>
+  <link rel="stylesheet" href="../assets/dashboard.css?v=tracker-workspace">
+  <script src="../assets/dashboard.js?v=tracker-workspace" type="module"></script>
 </head>
 <body class="dashboard-page">
   <a class="skip" href="#content">Skip to dashboard</a>
-  <header class="site-header">
-    <div class="wrap top">
+  <header class="dashboard-header">
+    <div class="dashboard-top">
       <a class="brand" href="../"><img src="../assets/rt-logo.webp" width="34" height="34" alt="">RobloTracker</a>
       <div class="dashboard-nav">
         <a class="dashboard-home" href="../">Main site</a>
@@ -28,22 +28,23 @@
       </div>
     </div>
   </header>
-  <main class="wrap dashboard" id="content">
-    <header class="dashboard-hero">
-      <h1 id="page-title">Tracker dashboard</h1>
-      <p>Browse your servers and see the latest activity from your trackers.</p>
-    </header>
-    <div class="workspace-bar">
-      <nav aria-label="Dashboard navigation" id="workspace-nav" hidden>
-        <a href="#" id="servers-back" hidden>Servers</a>
-        <a href="#" id="trackers-back" hidden>Trackers</a>
+  <main class="dashboard" id="content" data-panel="access">
+    <aside class="workspace-rail">
+      <nav class="rail-nav" aria-label="Dashboard navigation" id="workspace-nav" hidden>
+        <a href="#" id="servers-back" hidden><span class="rail-mark rail-servers" aria-hidden="true"></span> Servers</a>
+        <a href="#" id="trackers-back" hidden><span class="rail-mark rail-trackers" aria-hidden="true"></span> Trackers</a>
       </nav>
-      <p id="dashboard-status" role="status">Your dashboard is locked.</p>
-    </div>
+      <a class="rail-help" href="../#commands">Command guide <span aria-hidden="true">↗</span></a>
+    </aside>
+    <div class="workspace-content">
+      <div class="workspace-bar">
+        <div id="workspace-location" hidden>Dashboard <span aria-hidden="true">/</span> <span id="location-name">Overview</span></div>
+        <p id="dashboard-status" role="status"></p>
+      </div>
     <section id="access" class="dashboard-panel" aria-labelledby="access-title">
       <div class="access-content">
-        <h2 id="access-title">Connect your Discord account</h2>
-        <p>See the servers you share with RobloTracker and the tracker channels you can read.</p>
+        <h1 id="access-title">Tracker dashboard</h1>
+        <p>Open your servers and follow the Roblox accounts your Discord server tracks.</p>
         <button id="sign-in" class="button" type="button" hidden><img src="../assets/discord.svg" width="20" height="20" alt=""> Sign in with Discord</button>
         <p id="oauth-unavailable" class="dashboard-note" hidden>Use Discord verification to load your profile and shared servers.</p>
         <details id="code-access">
@@ -62,10 +63,15 @@
         </details>
         <noscript><p>Enable JavaScript to unlock the dashboard.</p></noscript>
       </div>
+      <div class="access-art" aria-hidden="true">
+        <img src="../assets/rt-logo.webp" width="176" height="176" alt="">
+      </div>
     </section>
     <section id="servers" class="dashboard-panel" aria-labelledby="servers-title" hidden>
-      <h2 id="servers-title">Your servers</h2>
-      <p>Choose a server to see its trackers.</p>
+      <header class="workspace-section-title">
+        <h1 id="servers-title">Your servers</h1>
+        <p id="server-count"></p>
+      </header>
       <ul id="server-list" class="server-list"></ul>
       <div id="servers-empty" hidden>
         <p>You don’t share any tracking servers with RobloTracker yet.</p>
@@ -76,13 +82,14 @@
       <div class="tracker-toolbar">
         <div>
           <p id="tracker-server" class="dashboard-note"></p>
-          <h2 id="index-title">Your trackers</h2>
+          <h1 id="index-title">Trackers</h1>
         </div>
         <div class="tracker-search">
           <label for="search">Find a Roblox account</label>
           <input id="search" type="search" placeholder="Username or display name" autocomplete="off">
         </div>
       </div>
+      <p id="tracker-count" class="list-count"></p>
       <ul id="tracker-list" class="tracker-list"></ul>
       <p id="index-empty" hidden>No trackers match your search.</p>
     </section>
@@ -90,7 +97,7 @@
       <div class="dashboard-panel profile-panel">
         <img id="account-image" src="../assets/rt-logo.webp" width="80" height="80" alt="">
         <div>
-          <h2 id="account-name"></h2>
+          <h1 id="account-name"></h1>
           <p id="account-handle"></p>
           <a id="account-profile" rel="noreferrer">Roblox profile <span aria-hidden="true">↗</span></a>
         </div>
@@ -102,15 +109,16 @@
       </dl>
       <section class="dashboard-panel" aria-labelledby="activity-title">
         <h2 id="activity-title">Recent alerts</h2>
-        <ul id="activity-list" class="tracker-list"></ul>
+        <ul id="activity-list" class="activity-list"></ul>
         <p id="activity-empty" hidden>No delivered alerts in this channel yet.</p>
       </section>
     </section>
     <section id="denied" class="dashboard-panel" hidden>
-      <h2>Tracker unavailable</h2>
-      <p>Open the tracker in Discord and check that you can see the channel and read its message history. If this alert is from a different server, lock the dashboard and unlock it there.</p>
-      <a href="#">Back to your tracker list</a>
+      <h1>Tracker unavailable</h1>
+      <p>Check that you can open the tracker’s Discord channel and read its message history.</p>
+      <a href="#" class="button secondary">Back to dashboard</a>
     </section>
+    </div>
   </main>
 </body>
 </html>

@@ -63,6 +63,9 @@ async function post(path, data = {}, authorization = token) {
 }
 
 function showPanel(panel) {
+  byId("content").dataset.panel = panel || "loading";
+  byId("workspace-location").hidden = true;
+  byId("location-name").textContent = "";
   for (const id of ["access", "servers", "index", "detail", "denied"]) byId(id).hidden = id !== panel;
   byId("lock").hidden = !token;
   if (panel !== "servers") byId("server-list").replaceChildren();
@@ -78,7 +81,7 @@ function showPanel(panel) {
   }
 }
 
-function renderViewer(viewer, panel, guild) {
+function renderViewer(viewer, panel, guild, locationLabel) {
   const account = byId("viewer");
   account.hidden = !viewer;
   byId("viewer-name").textContent = viewer?.name || "";
@@ -86,11 +89,17 @@ function renderViewer(viewer, panel, guild) {
   byId("viewer-avatar").src = viewer?.avatar || "../assets/discord.svg";
   byId("lock").textContent = viewer ? "Sign out" : "Lock";
   const serversBack = byId("servers-back");
-  serversBack.hidden = !viewer || panel === "servers" || !panel;
+  serversBack.hidden = !viewer || !panel || panel === "access";
   const trackersBack = byId("trackers-back");
-  trackersBack.hidden = panel !== "detail";
+  trackersBack.hidden = panel !== "detail" && !(panel === "index" && viewer && guild);
   trackersBack.href = serverRoute(viewer ? guild : null);
+  for (const [link, active] of [[serversBack, panel === "servers"], [trackersBack, panel === "index"]]) {
+    if (active) link.setAttribute("aria-current", "page");
+    else link.removeAttribute("aria-current");
+  }
   byId("workspace-nav").hidden = serversBack.hidden && trackersBack.hidden;
+  byId("location-name").textContent = locationLabel || "";
+  byId("workspace-location").hidden = !locationLabel;
 }
 
 function timeText(value) {
@@ -98,15 +107,34 @@ function timeText(value) {
   return Number.isNaN(date.getTime()) ? "Unavailable" : date.toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
 }
 
-function linkRow(text, secondary, href, time = false) {
+function rowArrow() {
+  const arrow = document.createElement("span");
+  arrow.className = "row-arrow";
+  arrow.textContent = "→";
+  arrow.setAttribute("aria-hidden", "true");
+  return arrow;
+}
+
+function trackerRow(item, guild) {
   const li = document.createElement("li");
-  const a = document.createElement("a");
-  const metadata = document.createElement(time ? "time" : "small");
-  a.href = href;
-  a.textContent = text;
-  metadata.textContent = secondary;
-  a.append(metadata);
-  li.append(a);
+  const link = document.createElement("a");
+  const initial = document.createElement("span");
+  const title = document.createElement("span");
+  const name = document.createElement("strong");
+  const handle = document.createElement("small");
+  const state = document.createElement("span");
+  link.href = serverRoute(guild, item.channel);
+  initial.className = "tracker-initial";
+  initial.setAttribute("aria-hidden", "true");
+  name.textContent = item.name || item.username;
+  initial.textContent = name.textContent.trim().slice(0, 2).toUpperCase();
+  handle.textContent = `@${item.username}`;
+  title.className = "row-title";
+  title.append(name, handle);
+  state.className = "row-state";
+  state.textContent = item.paused ? "Paused" : "Monitoring";
+  link.append(initial, title, state, rowArrow());
+  li.append(link);
   return li;
 }
 
@@ -118,7 +146,6 @@ function renderServers(servers) {
     const link = document.createElement("a");
     const icon = document.createElement("img");
     const name = document.createElement("span");
-    const arrow = document.createElement("span");
     link.href = serverRoute(server.id);
     icon.src = server.icon || "../assets/rt-logo.webp";
     icon.alt = "";
@@ -126,22 +153,22 @@ function renderServers(servers) {
     icon.height = 38;
     icon.addEventListener("error", () => { icon.src = "../assets/rt-logo.webp"; }, { once: true });
     name.textContent = server.name;
-    arrow.textContent = "→";
-    arrow.setAttribute("aria-hidden", "true");
-    link.append(icon, name, arrow);
+    link.append(icon, name, rowArrow());
     item.append(link);
     return item;
   }));
+  byId("server-count").textContent = entries.length ? `${entries.length} shared ${entries.length === 1 ? "server" : "servers"}` : "";
   byId("servers-empty").hidden = entries.length !== 0;
 }
 
 function renderIndex() {
   const guild = currentRoute().guild;
   const filter = search.value.trim().toLowerCase().replace(/^@/, "");
-  const matching = trackers.filter(item => snowflake.test(item.channel) &&
-    [item.username, item.name].some(value => String(value).toLowerCase().includes(filter)));
-  byId("tracker-list").replaceChildren(...matching.map(item =>
-    linkRow(`@${item.username}`, item.paused ? "Paused" : item.name, serverRoute(guild, item.channel))));
+  const matching = trackers.filter(item =>
+    [item.username, item.name].some(value => (value || "").toLowerCase().includes(filter)));
+  byId("tracker-list").replaceChildren(...matching.map(item => trackerRow(item, guild)));
+  const count = filter ? `${matching.length} of ${trackers.length}` : matching.length;
+  byId("tracker-count").textContent = trackers.length ? `${count} ${trackers.length === 1 ? "tracker" : "trackers"}` : "";
   byId("index-empty").hidden = matching.length > 0;
   byId("index-empty").textContent = trackers.length ? "No trackers match your search." : "You don’t have access to any tracker channels in this server.";
 }
@@ -152,23 +179,40 @@ const signalLabels = {
   username: "Username change", display_name: "Display name change", description: "Bio change",
 };
 
+function activityRow(event) {
+  const item = document.createElement("li");
+  const link = document.createElement("a");
+  const description = document.createElement("span");
+  const title = document.createElement("strong");
+  const date = document.createElement("time");
+  link.href = event.link;
+  title.textContent = signalLabels[event.kind] ||
+    (event.kind || "Update").replaceAll("_", " ").replace(/^./, letter => letter.toUpperCase());
+  if (!Number.isNaN(Date.parse(event.when))) date.dateTime = event.when;
+  date.textContent = timeText(event.when);
+  description.append(title, date);
+  link.append(description, rowArrow());
+  item.append(link);
+  return item;
+}
+
 function renderDetail(tracker) {
   byId("account-name").textContent = tracker.name || tracker.username;
   byId("account-handle").textContent = `@${tracker.username}`;
-  byId("account-state").textContent = tracker.paused ? "Paused" : tracker.presence || "Presence unavailable";
+  const state = byId("account-state");
+  state.textContent = tracker.paused ? "Paused" : tracker.presence || "Presence unavailable";
+  state.dataset.tone = ({ Online: "online", "In game": "game" })[state.textContent] || "neutral";
   byId("last-checked").textContent = timeText(tracker.checked);
   byId("account-game").textContent = tracker.presence === "In game" ? tracker.game || "Name unavailable" : "Unavailable";
-  if (/^https:\/\/www\.roblox\.com\/users\/[1-9][0-9]{0,18}\/profile$/.test(tracker.profile || "")) {
-    byId("account-profile").href = tracker.profile;
-  }
+  const profile = byId("account-profile");
+  profile.hidden = !/^https:\/\/www\.roblox\.com\/users\/[1-9][0-9]{0,18}\/profile$/.test(tracker.profile || "");
+  if (profile.hidden) profile.removeAttribute("href");
+  else profile.href = tracker.profile;
   const image = byId("account-image");
   image.src = tracker.avatar || "../assets/rt-logo.webp";
   const events = (tracker.activity || []).filter(event =>
     /^https:\/\/discord\.com\/channels\/\d+\/\d+\/\d+$/.test(event.link || ""));
-  byId("activity-list").replaceChildren(...events.map(event => linkRow(
-    signalLabels[event.kind] || (event.kind || "Update").replaceAll("_", " ").replace(/^./, letter => letter.toUpperCase()),
-    timeText(event.when), event.link, true,
-  )));
+  byId("activity-list").replaceChildren(...events.map(activityRow));
   byId("activity-empty").hidden = events.length > 0;
 }
 
@@ -213,17 +257,17 @@ async function refresh() {
       if (result.data.tracker) {
         showPanel("detail");
         renderDetail(result.data.tracker);
-        renderViewer(result.viewer, "detail", result.data.server?.id);
+        renderViewer(result.viewer, "detail", result.data.server?.id, "Tracker profile");
       } else if (result.data.servers) {
         showPanel("servers");
         renderServers(result.data.servers);
-        renderViewer(result.viewer, "servers");
+        renderViewer(result.viewer, "servers", null, "Servers");
       } else {
         showPanel("index");
         byId("tracker-server").textContent = result.data.server?.name || "";
-        trackers = result.data.trackers || [];
+        trackers = (result.data.trackers || []).filter(item => snowflake.test(item.channel));
         renderIndex();
-        renderViewer(result.viewer, "index");
+        renderViewer(result.viewer, "index", result.data.server?.id, "Trackers");
       }
     } else {
       const panel = result.state === "denied" ? "denied" : null;
