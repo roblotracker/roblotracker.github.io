@@ -11,7 +11,7 @@ const sessionLifetime = 20 * 60_000;
 const refreshAge = 12_000;
 const maximumAge = 24_000;
 const maxSessions = 300;
-const sessionDirectory = "tracker-sessions-profile";
+const sessionDirectory = "tracker-sessions-oauth";
 const headers = {
   "Cache-Control": "no-store",
   "X-Content-Type-Options": "nosniff",
@@ -52,6 +52,31 @@ function approvedViewer(viewer) {
   };
 }
 
+async function internalRequest(directory, path, value) {
+  const response = await directory.fetch(new Request("https://dashboard.internal" + path, {
+    method: "POST",
+    body: JSON.stringify(value),
+  }));
+  if (!response.ok) throw new Error("OAuth session no longer valid");
+  return response.json();
+}
+
+async function handleOAuthCallback(url, env, directory) {
+  const state = url.searchParams.get("state") || "";
+  const code = url.searchParams.get("code") || "";
+  const issuer = url.searchParams.get("iss");
+  if (!tokenPattern.test(state) || !code || code.length > 512 || !env.DISCORD_CLIENT_SECRET ||
+      (issuer && issuer !== "https://discord.com")) return oauthReturn("failed");
+  try {
+    const { proof } = await internalRequest(directory, "/internal/oauth/consume", { state });
+    const account = await discordIdentity(code, env.DISCORD_CLIENT_SECRET);
+    const { handoff } = await internalRequest(directory, "/internal/oauth/store", { proof, account });
+    return oauthReturn(handoff);
+  } catch {
+    return oauthReturn("failed");
+  }
+}
+
 async function body(request) {
   if (!request.body) return {};
   const reader = request.body.getReader();
@@ -72,10 +97,12 @@ async function body(request) {
 
 export default {
   async fetch(request, env) {
-    const path = new URL(request.url).pathname;
+    const url = new URL(request.url);
+    const path = url.pathname;
+    const directory = () => env.DASHBOARD.get(env.DASHBOARD.idFromName(sessionDirectory));
     if (path === "/oauth/callback") {
       if (request.method !== "GET") return reply({ error: "method_not_allowed" }, 405);
-      return env.DASHBOARD.get(env.DASHBOARD.idFromName(sessionDirectory)).fetch(request);
+      return handleOAuthCallback(url, env, directory());
     }
     if (botRoutes.has(path)) {
       const expected = env.DASHBOARD_BOT_KEY;
@@ -88,6 +115,9 @@ export default {
       if (request.method === "POST" && path === "/capabilities") {
         return reply({ discordSignIn: Boolean(env.DISCORD_CLIENT_SECRET) });
       }
+      if (request.method === "POST" && path === "/oauth/start" && !env.DISCORD_CLIENT_SECRET) {
+        return reply({ error: "not_configured" }, 503);
+      }
       if (request.method === "POST" && (path === "/pair" || path === "/oauth/start") && env.PAIR_LIMIT) {
         const limit = await env.PAIR_LIMIT.limit({ key: request.headers.get("CF-Connecting-IP") || "unknown" });
         if (!limit.success) return reply({ error: "try_again" }, 429);
@@ -96,13 +126,12 @@ export default {
       return reply({ error: "not_found" }, 404);
     }
     if (request.method !== "POST") return reply({ error: "method_not_allowed" }, 405);
-    return env.DASHBOARD.get(env.DASHBOARD.idFromName(sessionDirectory)).fetch(request);
+    return directory().fetch(request);
   },
 };
 
 export class DashboardSessions {
-  constructor(_context, env) {
-    this.env = env;
+  constructor() {
     this.sessions = new Map();
     this.codes = new Map();
     this.oauthAttempts = new Map();
@@ -124,26 +153,9 @@ export class DashboardSessions {
   }
 
   async fetch(request) {
-    const url = new URL(request.url);
-    const path = url.pathname;
+    const path = new URL(request.url).pathname;
     const now = Date.now();
     this.clearExpired(now);
-    if (path === "/oauth/callback") {
-      const state = url.searchParams.get("state") || "";
-      const code = url.searchParams.get("code") || "";
-      const accountAttempt = this.oauthAttempts.get(state);
-      if (!accountAttempt) return oauthReturn("failed");
-      this.oauthAttempts.delete(state);
-      if (!code || code.length > 512 || !this.env.DISCORD_CLIENT_SECRET) return oauthReturn("failed");
-      try {
-        const account = await discordIdentity(code, this.env.DISCORD_CLIENT_SECRET);
-        const handoff = randomHex(32);
-        this.handoffs.set(handoff, { proof: accountAttempt.proof, account, expires: Date.now() + 90_000 });
-        return oauthReturn(handoff);
-      } catch {
-        return oauthReturn("failed");
-      }
-    }
     let input;
     try {
       input = await body(request);
@@ -152,12 +164,23 @@ export class DashboardSessions {
       return reply({ error: "invalid_body" }, 400);
     }
     if (path === "/oauth/start") {
-      if (!this.env.DISCORD_CLIENT_SECRET) return reply({ error: "not_configured" }, 503);
       if (this.oauthAttempts.size >= maxSessions) return reply({ error: "busy" }, 429);
       const state = randomHex(32);
       const proof = randomHex(32);
       this.oauthAttempts.set(state, { proof, expires: now + pairingLifetime });
       return reply({ proof, url: authorizationUrl(state) });
+    }
+    if (path === "/internal/oauth/consume") {
+      const attempt = this.oauthAttempts.get(input.state);
+      if (!attempt || attempt.expires <= Date.now()) return reply({ error: "invalid_state" }, 403);
+      this.oauthAttempts.delete(input.state);
+      return reply({ proof: attempt.proof });
+    }
+    if (path === "/internal/oauth/store") {
+      if (this.handoffs.size >= maxSessions) return reply({ error: "busy" }, 429);
+      const handoff = randomHex(32);
+      this.handoffs.set(handoff, { proof: input.proof, account: input.account, expires: now + 90_000 });
+      return reply({ handoff });
     }
     if (path === "/oauth/finish") {
       const handoff = this.handoffs.get(input.handoff);
