@@ -29,23 +29,32 @@ export default {
     if (request.method !== "POST") return new Response(null, { status: 405, headers: { ...headers, Allow: "POST" } });
     if (!env.TURNSTILE_SECRET_KEY) return new Response(null, { status: 503, headers });
 
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 5000);
     try {
       const token = await readToken(request);
       if (!token) return new Response(null, { status: 400, headers });
       const response = await fetch(siteverify, {
         method: "POST",
-        body: new URLSearchParams({ secret: env.TURNSTILE_SECRET_KEY, response: token }),
-        signal: AbortSignal.timeout(5000),
-        redirect: "error",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ secret: env.TURNSTILE_SECRET_KEY, response: token }),
+        signal: controller.signal,
+        redirect: "manual",
       });
-      if (!response.ok) return new Response(null, { status: 503, headers });
+      if (!response.ok) {
+        console.warn("Turnstile Siteverify returned HTTP", response.status);
+        return new Response(null, { status: 503, headers });
+      }
       const result = await response.json();
       if (result.success !== true || result.hostname !== siteHost || result.action !== "rt_install") {
         return new Response(null, { status: 403, headers });
       }
       return Response.json({ redirect: installLink }, { headers });
-    } catch {
+    } catch (error) {
+      console.warn("Turnstile verification request failed", error?.name ?? "Error");
       return new Response(null, { status: 503, headers });
+    } finally {
+      clearTimeout(timeout);
     }
   },
 };

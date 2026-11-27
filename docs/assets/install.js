@@ -28,7 +28,7 @@
           action: "rt_install",
           theme: "dark",
           size: "flexible",
-          appearance: "interaction-only",
+          appearance: "always",
           callback: response => {
             token = response;
             status.textContent = "";
