@@ -21,29 +21,27 @@
   script.async = true;
   script.onerror = () => reset("The security check couldn’t load. Reload this page to try again.");
   script.onload = () => {
-    window.turnstile.ready(() => {
-      try {
-        widget = window.turnstile.render(challenge, {
-          sitekey: form.dataset.sitekey,
-          action: "rt_install",
-          theme: "dark",
-          size: "flexible",
-          appearance: "always",
-          callback: response => {
-            token = response;
-            status.textContent = "";
-            button.disabled = pending;
-          },
-          "expired-callback": () => reset("The security check expired. Please try again."),
-          "error-callback": () => {
-            reset("The security check couldn’t finish. Please try again.");
-            return true;
-          },
-        });
-      } catch {
-        reset("The security check couldn’t load. Reload this page to try again.");
-      }
-    });
+    try {
+      widget = window.turnstile.render(challenge, {
+        sitekey: form.dataset.sitekey,
+        action: "rt_install",
+        theme: "dark",
+        size: "flexible",
+        appearance: "always",
+        callback: response => {
+          token = response;
+          status.textContent = "";
+          button.disabled = pending;
+        },
+        "expired-callback": () => reset("The security check expired. Please try again."),
+        "error-callback": () => {
+          reset("The security check couldn’t finish. Please try again.");
+          return true;
+        },
+      });
+    } catch {
+      reset("The security check couldn’t load. Reload this page to try again.");
+    }
   };
   document.head.append(script);
 
