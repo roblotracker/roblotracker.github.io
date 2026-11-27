@@ -10,7 +10,7 @@
   <title>RobloTracker | Roblox alerts for Discord</title>
   <link rel="icon" type="image/webp" href="assets/rt-logo.webp">
   <script src="assets/page-progress.js?v=1" async></script>
-  <link rel="stylesheet" href="assets/site.css?v=community">
+  <link rel="stylesheet" href="assets/site.css?v=tracker-insights">
   <script src="assets/site.js?v=community" defer></script>
 </head>
 <body class="landing-page">
@@ -97,6 +97,21 @@
       </div>
     </section>
 
+    <section class="section surface insights-section" id="insights" aria-labelledby="insights-title">
+      <div class="wrap split">
+        <div class="section-intro">
+          <h2 id="insights-title">Tracker insights</h2>
+          <p>See how activity changes over time and review the public observations behind each result.</p>
+          <a class="section-link" href="#command-insights">Find the commands <span aria-hidden="true">↓</span></a>
+        </div>
+        <dl class="insight-details">
+          <div><dt>Weekly activity</dt><dd>Review estimated playtime, most-played experiences, and the busiest hour from saved sessions.</dd></div>
+          <div><dt>Account overlap</dt><dd>Compare saved public groups, mutual friends, and recently played experiences for two profiles you can view in your server.</dd></div>
+          <div><dt>Notable changes</dt><dd>See large friend-list drops, group departures, cleared bios, and changes in public Limited inventory or estimated RAP.</dd></div>
+        </dl>
+      </div>
+    </section>
+
     <section class="section surface" id="setup" aria-labelledby="setup-title">
       <div class="wrap split">
         <div class="section-intro">
@@ -123,6 +138,8 @@
         <div id="command-track-info"><dt><code>/track-info</code></dt><dd>Browse a profile and its available public data.</dd></div>
         <div id="command-join-game"><dt><code>/join-game</code></dt><dd>Check current public presence and open the Roblox profile.</dd></div>
         <div id="command-user-history"><dt><code>/user-history</code></dt><dd>Read saved alerts for a tracked account.</dd></div>
+        <div id="command-insights"><dt><code>/insights weekly</code></dt><dd>See seven days of observed sessions and notable changes.</dd></div>
+        <div><dt><code>/insights compare</code></dt><dd>Compare the saved public connections of two trackers.</dd></div>
         <div><dt><code>/settings</code></dt><dd>Choose account monitors and server defaults.</dd></div>
         <div id="command-alerts"><dt><code>/alerts settings</code></dt><dd>Choose which changes ping your saved recipients.</dd></div>
         <div><dt><code>/alerts recipients list</code></dt><dd>See who is on the tracker’s ping list.</dd></div>

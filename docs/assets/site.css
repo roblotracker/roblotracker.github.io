@@ -335,6 +335,19 @@ section[id] { scroll-margin-top: 1.5rem; }
 .feature-row:target h3, .commands > div:target dt code { color: #a5baff; }
 .commands > div[id] { scroll-margin-top: 1.5rem; }
 
+.insights-section {
+  background: linear-gradient(120deg, #151e35, #141924 78%);
+  border-block: 1px solid #303c59;
+}
+.insights-section .section-link { margin-top: .65rem; }
+.insight-details { border-top: 1px solid #374461; }
+.insight-details > div {
+  padding-block: 1rem;
+  border-bottom: 1px solid #374461;
+}
+.insight-details dt { color: var(--ink); font-weight: 720; }
+.insight-details dd { margin-top: .2rem; max-width: 52ch; }
+
 @media (max-width: 900px) {
   .feature-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
