@@ -10,8 +10,8 @@
   <title>RobloTracker | Roblox alerts for Discord</title>
   <link rel="icon" type="image/webp" href="assets/rt-logo.webp">
   <script src="assets/page-progress.js?v=1" async></script>
-  <link rel="stylesheet" href="assets/site.css?v=dashboard-entry">
-  <script src="assets/site.js?v=dashboard-entry" defer></script>
+  <link rel="stylesheet" href="assets/site.css?v=command-directory">
+  <script src="assets/site.js?v=command-directory" defer></script>
 </head>
 <body class="landing-page">
   <a class="skip" href="#main">Skip to content</a>
@@ -26,7 +26,6 @@
       </nav>
       <div class="nav-actions">
         <a class="button small secondary listing-link" href="https://top.gg/bot/1561527919375814709" aria-label="View RobloTracker on Top.gg">Top.gg</a>
-        <a class="button small secondary dashboard-link" href="dashboard/"><span class="rt-icon icon-grid" aria-hidden="true"></span>Dashboard</a>
         <a class="button small" href="install/" aria-label="Install RobloTracker"><img src="assets/discord.svg" alt="" width="20" height="20">Add</a>
       </div>
     </div>
@@ -35,16 +34,12 @@
 
     <section class="hero" aria-labelledby="hero-title">
       <div class="wrap hero-inner">
-        <div class="hero-copy">
-          <h1 id="hero-title">Roblox activity.<br><span>Right in Discord.</span></h1>
-          <p>Follow public Roblox activity and profile changes from your server. Pick what to track and who gets notified.</p>
-          <div class="actions">
-            <a class="button" href="install/"><img src="assets/discord.svg" alt="" width="22" height="22">Add to Discord</a>
-            <a class="button secondary dashboard-link" href="dashboard/"><span class="rt-icon icon-grid" aria-hidden="true"></span>Open Dashboard</a>
-          </div>
-        </div>
-        <div class="hero-mark" aria-hidden="true">
-          <img class="hero-logo" src="assets/rt-logo.webp" alt="" width="240" height="240" fetchpriority="high">
+        <img class="hero-logo" src="assets/rt-logo.webp" alt="" width="120" height="120" fetchpriority="high">
+        <h1 id="hero-title">Follow Roblox activity<br><span>from Discord.</span></h1>
+        <p>Get activity and profile updates in a dedicated Discord channel. Decide which changes ping your team.</p>
+        <div class="actions">
+          <a class="button" href="install/" aria-label="Install RobloTracker"><img src="assets/discord.svg" alt="" width="22" height="22">Add</a>
+          <a class="button secondary explore-button" href="#features">Explore features</a>
         </div>
       </div>
       <a class="hero-scroll" href="#features" aria-label="Scroll to features"></a>
@@ -70,32 +65,32 @@
       </header>
       <div class="feature-list">
         <section class="feature-row" id="activity" aria-labelledby="activity-title">
-          <h3 id="activity-title"><span class="rt-icon icon-activity" aria-hidden="true"></span>Game activity</h3>
+          <h3 id="activity-title">Game activity</h3>
           <p>See when a profile goes online, enters Studio, or joins or leaves a game. RT includes game names when Roblox returns them and estimates how long a session lasted.</p>
           <a class="feature-link" href="dashboard/">Tracker dashboard<span aria-hidden="true">→</span></a>
         </section>
         <section class="feature-row" id="profile" aria-labelledby="profile-title">
-          <h3 id="profile-title"><span class="rt-icon icon-profile" aria-hidden="true"></span>Profile and avatar</h3>
+          <h3 id="profile-title">Profile and avatar</h3>
           <p>Get updates when a username, display name, bio, or avatar changes. Avatar alerts can include a side-by-side preview when both images are available.</p>
           <a class="feature-link" href="#command-track-info"><code>/track-info</code><span aria-hidden="true">→</span></a>
         </section>
         <section class="feature-row" id="social" aria-labelledby="social-title">
-          <h3 id="social-title"><span class="rt-icon icon-friends" aria-hidden="true"></span>Friends and collections</h3>
+          <h3 id="social-title">Friends and collections</h3>
           <p>Browse available friends, badges, groups, outfits, and favorites. RT names friends in alerts when Roblox returns complete lists and shows counts when that’s all it receives.</p>
           <a class="feature-link" href="#command-track-info"><code>/track-info</code><span aria-hidden="true">→</span></a>
         </section>
         <section class="feature-row" id="delivery" aria-labelledby="delivery-title">
-          <h3 id="delivery-title"><span class="rt-icon icon-bell" aria-hidden="true"></span>Alert controls</h3>
+          <h3 id="delivery-title">Alert controls</h3>
           <p>Choose which changes can ping people, who gets notified, and how often a repeat alert can go out. Each tracker gets a dedicated Discord channel.</p>
           <a class="feature-link" href="#command-alerts"><code>/alerts settings</code><span aria-hidden="true">→</span></a>
         </section>
         <section class="feature-row" id="history" aria-labelledby="history-title">
-          <h3 id="history-title"><span class="rt-icon icon-clock" aria-hidden="true"></span>Alert history</h3>
+          <h3 id="history-title">Alert history</h3>
           <p>Find previously delivered alerts by Roblox account. Server managers can use <code>/status</code> to check tracker coverage and channel delivery.</p>
           <a class="feature-link" href="#command-user-history"><code>/user-history</code><span aria-hidden="true">→</span></a>
         </section>
         <section class="feature-row" id="data-controls" aria-labelledby="data-controls-title">
-          <h3 id="data-controls-title"><span class="rt-icon icon-lock" aria-hidden="true"></span>Profile removal</h3>
+          <h3 id="data-controls-title">Profile removal</h3>
           <p>If you own a tracked Roblox profile, start with <code>/privacy remove</code> to verify ownership and send a private removal request to RT’s team.</p>
           <a class="feature-link" href="privacy.html#requests">Data removal guide<span aria-hidden="true">→</span></a>
         </section>
@@ -219,7 +214,6 @@
     <div class="wrap foot">
       <div><a class="brand" href="./">RobloTracker</a><p>© 2026–2027 RobloTracker</p></div>
       <nav aria-label="Footer navigation">
-        <a href="dashboard/">Dashboard</a>
         <a href="#why-install">Why install?</a>
         <a href="#setup">Setup</a>
         <a href="#developers">Developers</a>

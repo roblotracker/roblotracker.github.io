@@ -9,9 +9,9 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; connect-src https://roblotracker-tracker-dashboard.install-verifier.workers.dev; img-src 'self' https://*.rbxcdn.com https://rbxcdn.com https://cdn.discordapp.com; object-src 'none'; base-uri 'none'; form-action 'none'">
   <title>Tracker dashboard | RobloTracker</title>
   <link rel="icon" href="../assets/rt-logo.webp" type="image/webp">
-  <link rel="stylesheet" href="../assets/site.css?v=dashboard-entry">
-  <link rel="stylesheet" href="../assets/dashboard.css?v=dashboard-entry">
-  <script src="../assets/dashboard.js?v=dashboard-entry" type="module"></script>
+  <link rel="stylesheet" href="../assets/site.css?v=install-verify">
+  <link rel="stylesheet" href="../assets/dashboard.css?v=tracker-workspace">
+  <script src="../assets/dashboard.js?v=tracker-workspace" type="module"></script>
 </head>
 <body class="dashboard-page">
   <a class="skip" href="#content">Skip to dashboard</a>
@@ -19,7 +19,7 @@
     <div class="dashboard-top">
       <a class="brand" href="../"><img src="../assets/rt-logo.webp" width="34" height="34" alt="">RobloTracker</a>
       <div class="dashboard-nav">
-        <a class="dashboard-home" href="../">Home</a>
+        <a class="dashboard-home" href="../">Main site</a>
         <div id="viewer" class="viewer-chip" hidden>
           <img id="viewer-avatar" src="../assets/discord.svg" width="26" height="26" alt="">
           <span id="viewer-name"></span>
@@ -28,13 +28,13 @@
       </div>
     </div>
   </header>
-  <main class="dashboard" id="content" data-panel="access" tabindex="-1">
+  <main class="dashboard" id="content" data-panel="access">
     <aside class="workspace-rail">
       <nav class="rail-nav" aria-label="Dashboard navigation" id="workspace-nav" hidden>
-        <a href="#" id="servers-back" hidden><span class="rt-icon icon-server" aria-hidden="true"></span> Servers</a>
-        <a href="#" id="trackers-back" hidden><span class="rt-icon icon-grid" aria-hidden="true"></span> Trackers</a>
+        <a href="#" id="servers-back" hidden><span class="rail-mark rail-servers" aria-hidden="true"></span> Servers</a>
+        <a href="#" id="trackers-back" hidden><span class="rail-mark rail-trackers" aria-hidden="true"></span> Trackers</a>
       </nav>
-      <a class="rail-help" href="../#commands">Command guide</a>
+      <a class="rail-help" href="../#commands">Command guide <span aria-hidden="true">↗</span></a>
     </aside>
     <div class="workspace-content">
       <div class="workspace-bar">
@@ -44,9 +44,9 @@
     <section id="access" class="dashboard-panel" aria-labelledby="access-title">
       <div class="access-content">
         <h1 id="access-title">Tracker dashboard</h1>
-        <p>Sign in to see your servers, tracked Roblox accounts, and recent alerts.</p>
+        <p>Open your servers and follow the Roblox accounts your Discord server tracks.</p>
         <button id="sign-in" class="button" type="button" hidden><img src="../assets/discord.svg" width="20" height="20" alt=""> Sign in with Discord</button>
-        <p id="oauth-unavailable" class="dashboard-note" hidden>Discord sign-in is unavailable. Use a one-time code.</p>
+        <p id="oauth-unavailable" class="dashboard-note" hidden>Use Discord verification to load your profile and shared servers.</p>
         <details id="code-access">
           <summary>Use a one-time code</summary>
           <p>Run <code>/tracker-dashboard</code> with the code below in any server where you use RobloTracker.</p>
@@ -108,7 +108,7 @@
         <div><dt>Experience</dt><dd id="account-game"></dd></div>
       </dl>
       <section class="dashboard-panel" aria-labelledby="activity-title">
-        <h2 id="activity-title"><span class="rt-icon icon-bell" aria-hidden="true"></span>Recent alerts</h2>
+        <h2 id="activity-title">Recent alerts</h2>
         <ul id="activity-list" class="activity-list"></ul>
         <p id="activity-empty" hidden>No delivered alerts in this channel yet.</p>
       </section>

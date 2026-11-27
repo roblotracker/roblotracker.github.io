@@ -50,7 +50,6 @@ async function post(path, data = {}, authorization = token) {
     method: "POST",
     cache: "no-store",
     credentials: "omit",
-    keepalive: path === "/lock",
     headers: {
       "Content-Type": "application/json",
       ...(authorization ? { Authorization: `Bearer ${authorization}` } : {}),
@@ -69,15 +68,10 @@ function showPanel(panel) {
   byId("location-name").textContent = "";
   for (const id of ["access", "servers", "index", "detail", "denied"]) byId(id).hidden = id !== panel;
   byId("lock").hidden = !token;
-  if (panel !== "servers") {
-    byId("server-list").replaceChildren();
-    byId("server-count").textContent = "";
-  }
+  if (panel !== "servers") byId("server-list").replaceChildren();
   if (panel !== "index") {
     trackers = [];
     byId("tracker-list").replaceChildren();
-    byId("tracker-server").textContent = "";
-    byId("tracker-count").textContent = "";
   }
   if (panel !== "detail") {
     for (const id of ["account-name", "account-handle", "account-state", "last-checked", "account-game"]) byId(id).textContent = "";
@@ -116,6 +110,7 @@ function timeText(value) {
 function rowArrow() {
   const arrow = document.createElement("span");
   arrow.className = "row-arrow";
+  arrow.textContent = "→";
   arrow.setAttribute("aria-hidden", "true");
   return arrow;
 }
@@ -137,7 +132,6 @@ function trackerRow(item, guild) {
   title.className = "row-title";
   title.append(name, handle);
   state.className = "row-state";
-  state.dataset.paused = String(Boolean(item.paused));
   state.textContent = item.paused ? "Paused" : "Monitoring";
   link.append(initial, title, state, rowArrow());
   li.append(link);
@@ -233,13 +227,6 @@ function locked(message) {
   status.textContent = message;
 }
 
-function openInstall() {
-  const previous = token;
-  locked("You don’t share a server with RobloTracker yet.");
-  void post("/lock", {}, previous).catch(() => {});
-  location.replace("../install/?from=dashboard");
-}
-
 async function refresh() {
   if (!token || document.hidden) return;
   if (inFlight) {
@@ -253,12 +240,7 @@ async function refresh() {
   try {
     const result = await post("/view", route);
     if (generation !== requestGeneration || routeHash !== location.hash || document.hidden) return;
-    if (result.state === "expired") return locked("Your session expired. Sign in again or use a new code.");
-    if (result.state === "ready" && !route.channel && !route.guild &&
-        Array.isArray(result.data?.servers) && result.data.servers.length === 0) {
-      openInstall();
-      return;
-    }
+    if (result.state === "expired") return locked("This session expired. Get a new code to continue.");
     const marker = `${routeHash}:${result.state}:${result.updated || ""}`;
     if (rendered === marker) return;
     rendered = marker;
@@ -271,12 +253,12 @@ async function refresh() {
       commandInput.value = result.code;
       status.textContent = "After you enter your code in Discord, your profile will load here automatically.";
     } else if (result.state === "ready" && result.data) {
-      status.textContent = result.updated ? `Updated ${timeText(result.updated)}` : "";
+      status.textContent = `Updated ${timeText(result.updated)}`;
       if (result.data.tracker) {
         showPanel("detail");
         renderDetail(result.data.tracker);
         renderViewer(result.viewer, "detail", result.data.server?.id, "Tracker profile");
-      } else if (Array.isArray(result.data.servers)) {
+      } else if (result.data.servers) {
         showPanel("servers");
         renderServers(result.data.servers);
         renderViewer(result.viewer, "servers", null, "Servers");
@@ -294,7 +276,7 @@ async function refresh() {
       status.textContent = result.state === "denied" ? "This channel couldn’t be verified." : "Checking your Discord access…";
     }
   } catch {
-    if (generation === requestGeneration && routeHash === location.hash && !document.hidden) {
+    if (generation === requestGeneration) {
       rendered = "";
       showPanel(null);
       status.textContent = "Connection interrupted. Reconnecting…";
@@ -402,15 +384,10 @@ byId("viewer-avatar").addEventListener("error", event => {
   const image = event.currentTarget;
   if (!image.src.endsWith("/discord.svg")) image.src = "../assets/discord.svg";
 });
-document.querySelector(".skip").addEventListener("click", event => {
-  event.preventDefault();
-  byId("content").focus();
-});
 search.addEventListener("input", renderIndex);
 window.addEventListener("hashchange", () => {
   if (!token) return;
   showPanel(null);
-  status.textContent = "Checking your Discord access…";
   rendered = "";
   refresh();
 });
@@ -441,8 +418,4 @@ document.addEventListener("visibilitychange", () => {
 window.setInterval(() => { if (!document.hidden) refresh(); }, 5000);
 await finishSignIn();
 showSignInOptions();
-if (token) {
-  showPanel(null);
-  status.textContent = "Checking your Discord access…";
-  refresh();
-}
+if (token) { showPanel(null); refresh(); }
