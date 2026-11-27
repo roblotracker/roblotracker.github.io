@@ -169,7 +169,7 @@
         if (node.textContent === formatted) return;
         node.textContent = formatted;
         const rect = node.getBoundingClientRect();
-        if (!motion.matches && rect.bottom > 0 && rect.top < innerHeight) {
+        if (node.animate && !motion.matches && rect.bottom > 0 && rect.top < innerHeight) {
           node.animate(
             [{ opacity: .35, transform: "translateY(4px)" }, { opacity: 1, transform: "translateY(0)" }],
             { duration: 360, easing: "ease-out" },

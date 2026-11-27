@@ -1,4 +1,8 @@
 (() => {
+  if (new URLSearchParams(location.search).get("from") === "dashboard") {
+    const note = document.querySelector("#dashboard-install-note");
+    if (note) note.hidden = false;
+  }
   const form = document.querySelector("#install-verification");
   if (!form || form.hidden || !form.dataset.sitekey || !form.dataset.verifier) return;
 

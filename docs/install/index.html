@@ -11,8 +11,8 @@
   <link rel="canonical" href="https://roblotracker.github.io/install/">
   <link rel="icon" type="image/webp" href="../assets/rt-logo.webp">
   <script src="../assets/page-progress.js?v=1" async></script>
-  <link rel="stylesheet" href="../assets/site.css?v=install-verify">
-  <script src="../assets/install.js?v=3" defer></script>
+  <link rel="stylesheet" href="../assets/site.css?v=dashboard-entry">
+  <script src="../assets/install.js?v=dashboard-entry" defer></script>
 </head>
 <body class="install-page">
   <a class="skip" href="#main">Skip to content</a>
@@ -26,7 +26,7 @@
         <a href="https://discord.gg/475THD4ftT">Support</a>
       </nav>
       <div class="nav-actions">
-        <a class="button small secondary listing-link" href="https://top.gg/bot/1561527919375814709" aria-label="View RobloTracker on Top.gg">Top.gg</a>
+        <a class="button small secondary dashboard-link" href="../dashboard/"><span class="rt-icon icon-grid" aria-hidden="true"></span>Dashboard</a>
       </div>
     </div>
   </header>
@@ -36,6 +36,7 @@
         <img class="install-logo" src="../assets/rt-logo.webp" alt="" width="76" height="76">
         <h1 id="install-title">Add RobloTracker<br class="install-title-break"> to Discord</h1>
         <p>Send public Roblox activity and profile updates to a channel in your Discord server.</p>
+        <p class="install-dashboard-note" id="dashboard-install-note" hidden>None of your Discord servers have RobloTracker yet. After you add it, return to the Dashboard and sign in again.</p>
         <form id="install-verification" data-sitekey="0x4AAAAAAGV9I7JeA_C_TG-B" data-verifier="https://roblotracker-install-verifier.install-verifier.workers.dev/verify">
           <div id="install-challenge"></div>
           <p id="install-status" role="status"></p>

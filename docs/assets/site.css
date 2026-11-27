@@ -105,6 +105,48 @@ section[id] { scroll-margin-top: 1.5rem; }
 .button.small { min-height: 38px; padding: .45rem .75rem; font-size: .92rem; }
 .button.small img { width: 1rem; height: 1rem; }
 
+.rt-icon {
+  display: inline-block;
+  position: relative;
+  flex: 0 0 1rem;
+  width: 1rem;
+  height: 1rem;
+  color: currentColor;
+}
+.rt-icon::before, .rt-icon::after { content: ""; position: absolute; }
+.icon-grid::before { inset: 0; border: 1.5px solid currentColor; border-radius: .23rem; }
+.icon-grid::after { inset: 0 50% 50% 0; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; }
+.icon-server::before { inset: 0 0 auto; height: .4rem; border: 1.5px solid currentColor; border-radius: .15rem; }
+.icon-server::after { inset: auto 0 0; height: .4rem; border: 1.5px solid currentColor; border-radius: .15rem; }
+.icon-activity::before {
+  inset: 0;
+  background: currentColor;
+  clip-path: polygon(0 55%, 21% 55%, 37% 11%, 59% 75%, 73% 45%, 100% 45%, 100% 56%, 80% 56%, 58% 98%, 37% 36%, 30% 66%, 0 66%);
+}
+.icon-profile::before, .icon-friends::before { inset: 0 auto auto 33%; width: .35rem; height: .35rem; border-radius: 50%; background: currentColor; }
+.icon-profile::after, .icon-friends::after { inset: auto 7% 4%; height: .45rem; border: 1.5px solid currentColor; border-radius: .45rem .45rem .15rem .15rem; }
+.icon-friends::before { left: 16%; box-shadow: .44rem 0 currentColor; }
+.icon-bell::before { inset: 0 13% 22%; border: 1.5px solid currentColor; border-radius: .55rem .55rem .15rem .15rem; }
+.icon-bell::after { inset: auto 40% 0; height: .12rem; background: currentColor; border-radius: .15rem; }
+.icon-clock::before { inset: 0; border: 1.5px solid currentColor; border-radius: 50%; }
+.icon-clock::after { inset: 20% 26% 45% 47%; border-left: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; }
+.icon-lock::before { inset: 0 23% 38%; border: 1.5px solid currentColor; border-radius: .35rem .35rem 0 0; }
+.icon-lock::after { inset: 38% 7% 0; border: 1.5px solid currentColor; border-radius: .18rem; background: var(--surface); }
+
+.dashboard-link { white-space: nowrap; }
+.nav-actions .dashboard-link { background: #273357; }
+.nav-actions .dashboard-link:hover { background: #364981; }
+.install-intro .install-dashboard-note {
+  max-width: 38rem;
+  margin-inline: auto;
+  padding: .65rem .85rem;
+  border: 1px solid #42568c;
+  border-radius: .6rem;
+  background: #141c33;
+  color: #dee7ff;
+  font-size: .92rem;
+}
+
 .hero {
   position: relative;
   isolation: isolate;
@@ -546,4 +588,56 @@ section[id] { scroll-margin-top: 1.5rem; }
 .install-reasons .button { justify-self: start; }
 @media (max-width: 670px) {
   .install-reasons-inner { grid-template-columns: 1fr; }
+}
+
+/* Landing page and dashboard share the same RT palette and icons. */
+.landing-page .hero { text-align: left; background: #11182d; }
+.landing-page .hero::before {
+  background:
+    linear-gradient(100deg, #101528 7%, #111831e8 40%, #172e7fa0 100%),
+    linear-gradient(0deg, #11182d, transparent 60%),
+    url("rt-wallpaper.webp") center / cover;
+}
+.landing-page .hero-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, .8fr);
+  align-items: center;
+  gap: clamp(2rem, 6vw, 6rem);
+}
+.landing-page .hero h1 { font-size: clamp(2.65rem, 6vw, 5.1rem); }
+.landing-page .hero p { margin-inline: 0; }
+.landing-page .hero .actions { justify-content: flex-start; }
+.landing-page .hero .dashboard-link { background: #202e55; }
+.landing-page .hero .dashboard-link:hover { background: #30477e; }
+.hero-mark {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border: 1px solid #7593ff63;
+  border-radius: 2rem;
+  background: linear-gradient(155deg, #4267ff58, #181f54ad);
+  box-shadow: 0 20px 55px #090f2e75, inset 0 1px #bbcbff24;
+}
+.landing-page .hero-mark .hero-logo { width: 61%; margin: 0; box-shadow: 0 14px 36px #070d3780; }
+.feature-row h3 { display: flex; align-items: center; gap: .65rem; text-wrap: initial; }
+.feature-row h3 .rt-icon {
+  flex-basis: 1.75rem;
+  width: 1.75rem;
+  height: 1.75rem;
+  color: #a9beff;
+}
+.feature-row h3 .rt-icon::before, .feature-row h3 .rt-icon::after { transform: scale(.83); }
+.feature-row h3 .icon-profile::before, .feature-row h3 .icon-friends::before { top: .28rem; }
+.feature-row h3 .icon-profile::after, .feature-row h3 .icon-friends::after { bottom: .28rem; }
+.feature-row h3 .icon-bell::after { bottom: .12rem; }
+
+@media (max-width: 880px) {
+  .landing-page .nav-actions .listing-link { display: none; }
+}
+@media (max-width: 670px) {
+  .landing-page .hero-inner { grid-template-columns: 1fr; gap: 1.1rem; text-align: center; }
+  .hero-copy { grid-row: 2; }
+  .hero-mark { width: 5.6rem; border-radius: 1.15rem; margin-inline: auto; }
+  .landing-page .hero p { margin-inline: auto; }
+  .landing-page .hero .actions { justify-content: center; }
 }
