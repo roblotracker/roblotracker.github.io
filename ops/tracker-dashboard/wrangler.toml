@@ -1,0 +1,18 @@
+name = "roblotracker-tracker-dashboard"
+main = "worker.mjs"
+compatibility_date = "2026-11-27"
+workers_dev = true
+preview_urls = false
+
+[[ratelimits]]
+name = "PAIR_LIMIT"
+namespace_id = "9781"
+simple = { limit = 6, period = 60 }
+
+[[durable_objects.bindings]]
+name = "DASHBOARD"
+class_name = "DashboardSessions"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["DashboardSessions"]
