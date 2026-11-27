@@ -7,6 +7,9 @@ const byId = id => document.getElementById(id);
 const status = byId("dashboard-status");
 const commandInput = byId("pair-command");
 const search = byId("search");
+const filterButtons = [...document.querySelectorAll(".tracker-filters [data-filter]")];
+let trackerFilter = "all";
+let searchGuild = null;
 let token;
 let inFlight = false;
 let updateRequested = false;
@@ -107,6 +110,13 @@ function timeText(value) {
   return Number.isNaN(date.getTime()) ? "Unavailable" : date.toLocaleString([], { dateStyle: "medium", timeStyle: "short" });
 }
 
+function setTrackerFilter(value) {
+  trackerFilter = value;
+  for (const button of filterButtons) {
+    button.setAttribute("aria-pressed", String(button.dataset.filter === value));
+  }
+}
+
 function rowArrow() {
   const arrow = document.createElement("span");
   arrow.className = "row-arrow";
@@ -132,6 +142,7 @@ function trackerRow(item, guild) {
   title.className = "row-title";
   title.append(name, handle);
   state.className = "row-state";
+  state.dataset.paused = String(Boolean(item.paused));
   state.textContent = item.paused ? "Paused" : "Monitoring";
   link.append(initial, title, state, rowArrow());
   li.append(link);
@@ -165,12 +176,14 @@ function renderIndex() {
   const guild = currentRoute().guild;
   const filter = search.value.trim().toLowerCase().replace(/^@/, "");
   const matching = trackers.filter(item =>
+    (trackerFilter === "all" || Boolean(item.paused) === (trackerFilter === "paused")) &&
     [item.username, item.name].some(value => (value || "").toLowerCase().includes(filter)));
   byId("tracker-list").replaceChildren(...matching.map(item => trackerRow(item, guild)));
-  const count = filter ? `${matching.length} of ${trackers.length}` : matching.length;
-  byId("tracker-count").textContent = trackers.length ? `${count} ${trackers.length === 1 ? "tracker" : "trackers"}` : "";
+  const count = filter || trackerFilter !== "all" ? `${matching.length} of ${trackers.length}` : matching.length;
+  const countText = trackers.length ? `${count} ${trackers.length === 1 ? "tracker" : "trackers"}` : "";
+  if (byId("tracker-count").textContent !== countText) byId("tracker-count").textContent = countText;
   byId("index-empty").hidden = matching.length > 0;
-  byId("index-empty").textContent = trackers.length ? "No trackers match your search." : "You don’t have access to any tracker channels in this server.";
+  byId("index-empty").textContent = trackers.length ? "No trackers match these filters." : "You don’t have access to any tracker channels in this server.";
 }
 
 const signalLabels = {
@@ -203,7 +216,9 @@ function renderDetail(tracker) {
   state.textContent = tracker.paused ? "Paused" : tracker.presence || "Presence unavailable";
   state.dataset.tone = ({ Online: "online", "In game": "game" })[state.textContent] || "neutral";
   byId("last-checked").textContent = timeText(tracker.checked);
-  byId("account-game").textContent = tracker.presence === "In game" ? tracker.game || "Name unavailable" : "Unavailable";
+  const showGame = !tracker.paused && tracker.presence === "In game";
+  byId("game-observation").hidden = !showGame;
+  byId("account-game").textContent = showGame ? tracker.game || "Name unavailable" : "";
   const profile = byId("account-profile");
   profile.hidden = !/^https:\/\/www\.roblox\.com\/users\/[1-9][0-9]{0,18}\/profile$/.test(tracker.profile || "");
   if (profile.hidden) profile.removeAttribute("href");
@@ -220,6 +235,9 @@ function locked(message) {
   setToken(null);
   rendered = "";
   commandInput.value = "";
+  search.value = "";
+  searchGuild = null;
+  setTrackerFilter("all");
   byId("pairing").hidden = true;
   byId("pair").hidden = false;
   showPanel("access");
@@ -240,7 +258,7 @@ async function refresh() {
   try {
     const result = await post("/view", route);
     if (generation !== requestGeneration || routeHash !== location.hash || document.hidden) return;
-    if (result.state === "expired") return locked("This session expired. Get a new code to continue.");
+    if (result.state === "expired") return locked("Your session expired. Sign in again or use a new code.");
     const marker = `${routeHash}:${result.state}:${result.updated || ""}`;
     if (rendered === marker) return;
     rendered = marker;
@@ -264,6 +282,12 @@ async function refresh() {
         renderViewer(result.viewer, "servers", null, "Servers");
       } else {
         showPanel("index");
+        const guild = result.data.server?.id || route.guild;
+        if (searchGuild !== guild) {
+          searchGuild = guild;
+          search.value = "";
+          setTrackerFilter("all");
+        }
         byId("tracker-server").textContent = result.data.server?.name || "";
         trackers = (result.data.trackers || []).filter(item => snowflake.test(item.channel));
         renderIndex();
@@ -385,6 +409,16 @@ byId("viewer-avatar").addEventListener("error", event => {
   if (!image.src.endsWith("/discord.svg")) image.src = "../assets/discord.svg";
 });
 search.addEventListener("input", renderIndex);
+for (const button of filterButtons) {
+  button.addEventListener("click", () => {
+    setTrackerFilter(button.dataset.filter);
+    renderIndex();
+  });
+}
+document.querySelector(".skip").addEventListener("click", event => {
+  event.preventDefault();
+  byId("content").focus();
+});
 window.addEventListener("hashchange", () => {
   if (!token) return;
   showPanel(null);

@@ -10,8 +10,8 @@
   <title>Tracker dashboard | RobloTracker</title>
   <link rel="icon" href="../assets/rt-logo.webp" type="image/webp">
   <link rel="stylesheet" href="../assets/site.css?v=install-verify">
-  <link rel="stylesheet" href="../assets/dashboard.css?v=tracker-workspace">
-  <script src="../assets/dashboard.js?v=tracker-workspace" type="module"></script>
+  <link rel="stylesheet" href="../assets/dashboard.css?v=tracker-controls">
+  <script src="../assets/dashboard.js?v=tracker-controls" type="module"></script>
 </head>
 <body class="dashboard-page">
   <a class="skip" href="#content">Skip to dashboard</a>
@@ -28,7 +28,7 @@
       </div>
     </div>
   </header>
-  <main class="dashboard" id="content" data-panel="access">
+  <main class="dashboard" id="content" data-panel="access" tabindex="-1">
     <aside class="workspace-rail">
       <nav class="rail-nav" aria-label="Dashboard navigation" id="workspace-nav" hidden>
         <a href="#" id="servers-back" hidden><span class="rail-mark rail-servers" aria-hidden="true"></span> Servers</a>
@@ -44,7 +44,7 @@
     <section id="access" class="dashboard-panel" aria-labelledby="access-title">
       <div class="access-content">
         <h1 id="access-title">Tracker dashboard</h1>
-        <p>Open your servers and follow the Roblox accounts your Discord server tracks.</p>
+        <p>See the Roblox accounts and alerts you can access in Discord.</p>
         <button id="sign-in" class="button" type="button" hidden><img src="../assets/discord.svg" width="20" height="20" alt=""> Sign in with Discord</button>
         <p id="oauth-unavailable" class="dashboard-note" hidden>Use Discord verification to load your profile and shared servers.</p>
         <details id="code-access">
@@ -89,25 +89,34 @@
           <input id="search" type="search" placeholder="Username or display name" autocomplete="off">
         </div>
       </div>
-      <p id="tracker-count" class="list-count"></p>
+      <div class="tracker-controls">
+        <div class="tracker-filters" role="group" aria-label="Filter trackers by status">
+          <button type="button" data-filter="all" aria-pressed="true">All</button>
+          <button type="button" data-filter="monitoring" aria-pressed="false">Monitoring</button>
+          <button type="button" data-filter="paused" aria-pressed="false">Paused</button>
+        </div>
+        <p id="tracker-count" class="list-count" role="status"></p>
+      </div>
       <ul id="tracker-list" class="tracker-list"></ul>
       <p id="index-empty" hidden>No trackers match your search.</p>
     </section>
-    <section id="detail" aria-labelledby="account-name" hidden>
-      <div class="dashboard-panel profile-panel">
-        <img id="account-image" src="../assets/rt-logo.webp" width="80" height="80" alt="">
-        <div>
-          <h1 id="account-name"></h1>
-          <p id="account-handle"></p>
-          <a id="account-profile" rel="noreferrer">Roblox profile <span aria-hidden="true">↗</span></a>
+    <section id="detail" class="dashboard-panel" aria-labelledby="account-name" hidden>
+      <header class="profile-panel">
+        <div class="profile-heading">
+          <img id="account-image" src="../assets/rt-logo.webp" width="80" height="80" alt="">
+          <div>
+            <h1 id="account-name"></h1>
+            <p id="account-handle"></p>
+          </div>
+          <a id="account-profile" class="button small secondary" rel="noreferrer">Roblox profile</a>
         </div>
-        <span id="account-state" class="account-state"></span>
-      </div>
-      <dl class="dashboard-panel dashboard-summary">
-        <div><dt>Last observed</dt><dd id="last-checked"></dd></div>
-        <div><dt>Experience</dt><dd id="account-game"></dd></div>
-      </dl>
-      <section class="dashboard-panel" aria-labelledby="activity-title">
+        <dl class="dashboard-summary">
+          <div><dt>Status</dt><dd><span id="account-state" class="account-state"></span></dd></div>
+          <div id="game-observation" hidden><dt>Experience</dt><dd id="account-game"></dd></div>
+          <div><dt>Last observed</dt><dd id="last-checked"></dd></div>
+        </dl>
+      </header>
+      <section class="profile-activity" aria-labelledby="activity-title">
         <h2 id="activity-title">Recent alerts</h2>
         <ul id="activity-list" class="activity-list"></ul>
         <p id="activity-empty" hidden>No delivered alerts in this channel yet.</p>
