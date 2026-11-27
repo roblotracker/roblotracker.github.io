@@ -7,6 +7,13 @@ const byId = id => document.getElementById(id);
 const status = byId("dashboard-status");
 const commandInput = byId("pair-command");
 const search = byId("search");
+const content = byId("content");
+const sidebarToggle = byId("sidebar-toggle");
+const fullscreenToggle = byId("fullscreen-toggle");
+const narrowViewport = matchMedia("(max-width: 780px)");
+const sidebarKey = "rt-dashboard-sidebar";
+let desktopCollapsed = false;
+let mobileCollapsed = true;
 const filterButtons = [...document.querySelectorAll(".tracker-filters [data-filter]")];
 let trackerFilter = "all";
 let searchGuild = null;
@@ -19,8 +26,18 @@ let generation = 0;
 
 try {
   token = localStorage.getItem(storageKey);
+  desktopCollapsed = localStorage.getItem(sidebarKey) === "collapsed";
 } catch {
   // The dashboard can still work for this tab.
+}
+
+function updateSidebar() {
+  const collapsed = narrowViewport.matches ? mobileCollapsed : desktopCollapsed;
+  content.dataset.sidebar = collapsed ? "collapsed" : "expanded";
+  const description = collapsed ? "Expand sidebar" : "Collapse sidebar";
+  sidebarToggle.setAttribute("aria-expanded", String(!collapsed));
+  sidebarToggle.setAttribute("aria-label", description);
+  sidebarToggle.title = description;
 }
 
 function setToken(value) {
@@ -66,7 +83,9 @@ async function post(path, data = {}, authorization = token) {
 }
 
 function showPanel(panel) {
-  byId("content").dataset.panel = panel || "loading";
+  content.dataset.panel = panel || "loading";
+  sidebarToggle.hidden = panel === "access";
+  fullscreenToggle.hidden = !document.fullscreenEnabled || panel === "access";
   byId("workspace-location").hidden = true;
   byId("location-name").textContent = "";
   for (const id of ["access", "servers", "index", "detail", "denied"]) byId(id).hidden = id !== panel;
@@ -120,7 +139,6 @@ function setTrackerFilter(value) {
 function rowArrow() {
   const arrow = document.createElement("span");
   arrow.className = "row-arrow";
-  arrow.textContent = "→";
   arrow.setAttribute("aria-hidden", "true");
   return arrow;
 }
@@ -179,6 +197,7 @@ function renderIndex() {
     (trackerFilter === "all" || Boolean(item.paused) === (trackerFilter === "paused")) &&
     [item.username, item.name].some(value => (value || "").toLowerCase().includes(filter)));
   byId("tracker-list").replaceChildren(...matching.map(item => trackerRow(item, guild)));
+  byId("tracker-directory").hidden = matching.length === 0;
   const count = filter || trackerFilter !== "all" ? `${matching.length} of ${trackers.length}` : matching.length;
   const countText = trackers.length ? `${count} ${trackers.length === 1 ? "tracker" : "trackers"}` : "";
   if (byId("tracker-count").textContent !== countText) byId("tracker-count").textContent = countText;
@@ -417,7 +436,38 @@ for (const button of filterButtons) {
 }
 document.querySelector(".skip").addEventListener("click", event => {
   event.preventDefault();
-  byId("content").focus();
+  content.focus();
+});
+sidebarToggle.addEventListener("click", () => {
+  if (narrowViewport.matches) {
+    mobileCollapsed = !mobileCollapsed;
+  } else {
+    desktopCollapsed = !desktopCollapsed;
+    try {
+      localStorage.setItem(sidebarKey, desktopCollapsed ? "collapsed" : "expanded");
+    } catch {
+      // Keep the preference in this tab when browser storage is unavailable.
+    }
+  }
+  updateSidebar();
+});
+narrowViewport.addEventListener("change", updateSidebar);
+updateSidebar();
+
+fullscreenToggle.addEventListener("click", async () => {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else await document.documentElement.requestFullscreen();
+  } catch {
+    status.textContent = "Full screen is unavailable in this browser window.";
+  }
+});
+document.addEventListener("fullscreenchange", () => {
+  const active = Boolean(document.fullscreenElement);
+  const description = active ? "Exit full screen" : "Full screen";
+  fullscreenToggle.setAttribute("aria-pressed", String(active));
+  fullscreenToggle.setAttribute("aria-label", description);
+  fullscreenToggle.title = description;
 });
 window.addEventListener("hashchange", () => {
   if (!token) return;

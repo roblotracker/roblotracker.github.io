@@ -10,16 +10,19 @@
   <title>Tracker dashboard | RobloTracker</title>
   <link rel="icon" href="../assets/rt-logo.webp" type="image/webp">
   <link rel="stylesheet" href="../assets/site.css?v=install-verify">
-  <link rel="stylesheet" href="../assets/dashboard.css?v=tracker-controls">
-  <script src="../assets/dashboard.js?v=tracker-controls" type="module"></script>
+  <link rel="stylesheet" href="../assets/dashboard.css?v=wide-workspace">
+  <script src="../assets/dashboard.js?v=wide-workspace" type="module"></script>
 </head>
 <body class="dashboard-page">
   <a class="skip" href="#content">Skip to dashboard</a>
   <header class="dashboard-header">
     <div class="dashboard-top">
-      <a class="brand" href="../"><img src="../assets/rt-logo.webp" width="34" height="34" alt="">RobloTracker</a>
+      <div class="dashboard-identity">
+        <button id="sidebar-toggle" class="dashboard-tool" type="button" aria-controls="workspace-rail" aria-expanded="true" aria-label="Collapse sidebar" title="Collapse sidebar" hidden><span class="sidebar-icon" aria-hidden="true"></span></button>
+        <a class="brand" href="../"><img src="../assets/rt-logo.webp" width="34" height="34" alt="">RobloTracker</a>
+      </div>
       <div class="dashboard-nav">
-        <a class="dashboard-home" href="../">Main site</a>
+        <button id="fullscreen-toggle" class="dashboard-tool" type="button" aria-pressed="false" aria-label="Full screen" title="Full screen" hidden><span class="fullscreen-icon" aria-hidden="true"></span></button>
         <div id="viewer" class="viewer-chip" hidden>
           <img id="viewer-avatar" src="../assets/discord.svg" width="26" height="26" alt="">
           <span id="viewer-name"></span>
@@ -28,13 +31,13 @@
       </div>
     </div>
   </header>
-  <main class="dashboard" id="content" data-panel="access" tabindex="-1">
-    <aside class="workspace-rail">
+  <main class="dashboard" id="content" data-panel="access" data-sidebar="expanded" tabindex="-1">
+    <aside class="workspace-rail" id="workspace-rail">
       <nav class="rail-nav" aria-label="Dashboard navigation" id="workspace-nav" hidden>
-        <a href="#" id="servers-back" hidden><span class="rail-mark rail-servers" aria-hidden="true"></span> Servers</a>
-        <a href="#" id="trackers-back" hidden><span class="rail-mark rail-trackers" aria-hidden="true"></span> Trackers</a>
+        <a href="#" id="servers-back" aria-label="Servers" title="Servers" hidden><span class="rail-mark rail-servers" aria-hidden="true"></span><span class="rail-label">Servers</span></a>
+        <a href="#" id="trackers-back" aria-label="Trackers" title="Trackers" hidden><span class="rail-mark rail-trackers" aria-hidden="true"></span><span class="rail-label">Trackers</span></a>
       </nav>
-      <a class="rail-help" href="../#commands">Command guide <span aria-hidden="true">↗</span></a>
+      <a class="rail-help" href="../#commands" aria-label="Command guide" title="Command guide"><span class="rail-mark rail-guide" aria-hidden="true"></span><span class="rail-label">Command guide</span></a>
     </aside>
     <div class="workspace-content">
       <div class="workspace-bar">
@@ -97,7 +100,10 @@
         </div>
         <p id="tracker-count" class="list-count" role="status"></p>
       </div>
-      <ul id="tracker-list" class="tracker-list"></ul>
+      <div class="tracker-directory" id="tracker-directory" hidden>
+        <div class="tracker-columns" aria-hidden="true"><span>Roblox account</span><span>Tracker status</span></div>
+        <ul id="tracker-list" class="tracker-list"></ul>
+      </div>
       <p id="index-empty" hidden>No trackers match your search.</p>
     </section>
     <section id="detail" class="dashboard-panel" aria-labelledby="account-name" hidden>
