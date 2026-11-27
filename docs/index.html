@@ -131,6 +131,7 @@
       <div class="section-intro">
         <h2 id="commands-title">Commands</h2>
         <p>Browse commands here or open <code>/help</code> in Discord.</p>
+        <p><a href="#command-join-friend">How to join a friend</a></p>
       </div>
       <details class="command-directory">
         <summary>Command list</summary>
@@ -139,6 +140,10 @@
           <div><dt><code>/tracked-accounts</code></dt><dd>Browse the trackers you have access to.</dd></div>
           <div id="command-track-info"><dt><code>/track-info</code></dt><dd>Browse a profile and its available public data.</dd></div>
           <div id="command-join-game"><dt><code>/join-game</code></dt><dd>Check current public presence and open the Roblox profile.</dd></div>
+          <div id="command-join-friend"><dt><code>/join-friend list</code></dt><dd>See who is sharing with you in this Discord server. Pick a Roblox username and review the join link.</dd></div>
+          <div><dt><code>/join-friend open</code></dt><dd>Open the same player list, or type a Roblox username to find someone directly.</dd></div>
+          <div><dt><code>/join-friend setup</code></dt><dd>Enter your own Roblox username. Save the temporary code in your Roblox About section, then run <code>/join-friend verify</code> and remove the code.</dd></div>
+          <div><dt><code>/join-friend share</code></dt><dd>Use <code>/join-friend allow</code> to pick a friend, then start sharing. Use <code>/join-friend status</code> to review access, <code>revoke</code> to remove someone, or <code>stop</code> to stop sharing. <code>forget</code> clears your link and allowlist.</dd></div>
           <div id="command-user-history"><dt><code>/user-history</code></dt><dd>Read saved alerts for a tracked account.</dd></div>
           <div id="command-insights"><dt><code>/insights weekly</code></dt><dd>See seven days of observed sessions and notable changes.</dd></div>
           <div><dt><code>/insights compare</code></dt><dd>Compare the saved public connections of two trackers.</dd></div>
@@ -158,6 +163,7 @@
         <div class="faq">
           <details><summary>Why is a friend list or game missing?</summary><div class="faq-answer"><p>Roblox sometimes sends only a friend count or a presence status. Your signed-in Roblox view may show details the public API leaves out.</p></div></details>
           <details><summary>Why didn’t I get an alert right away?</summary><div class="faq-answer"><p>The first check gives RobloTracker a starting point. Later alerts depend on Roblox responding, the tracker’s cooldown, and whether RobloTracker can send to the Discord channel.</p></div></details>
+          <details><summary>Why can’t I see my friend in Join Friend?</summary><div class="faq-answer"><p>They must allow you and start sharing in the same Discord server. If you can see them in the list but Roblox won’t let you join, check that they’re still in a game and that their Roblox privacy settings let you join.</p></div></details>
           <details><summary>Does RobloTracker need Administrator?</summary><div class="faq-answer"><p>The install requests specific permissions, including Manage Channels and Manage Roles for tracker setup. Review the channel’s access after setup.</p></div></details>
           <details><summary>How do I remove my profile?</summary><div class="faq-answer"><p>Start with <code>/privacy remove</code> in a server that has RobloTracker or use the <a href="privacy.html#requests">removal guide</a>. For help or to report misuse, open a private support ticket.</p></div></details>
         </div>

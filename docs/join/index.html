@@ -10,8 +10,8 @@
   <title>Join a player | RobloTracker</title>
   <link rel="icon" type="image/webp" href="../assets/rt-logo.webp">
   <link rel="stylesheet" href="../assets/site.css?v=install-verify">
-  <link rel="stylesheet" href="../assets/join.css">
-  <script src="../assets/join.js" type="module"></script>
+  <link rel="stylesheet" href="../assets/join.css?v=2">
+  <script src="../assets/join.js?v=2" type="module"></script>
 </head>
 <body class="install-page">
   <header class="site-header">
@@ -22,19 +22,22 @@
   <main class="join-layout">
     <section class="join-panel" aria-labelledby="join-title">
       <h1 id="join-title">Join a Roblox player</h1>
-      <p id="join-status" role="status">Checking the join link…</p>
+      <div id="join-feedback">
+        <p id="join-status" role="status">Checking the join link…</p>
+        <a class="join-cancel" href="../#command-join-friend">See Join Friend commands</a>
+      </div>
       <noscript><p>Enable JavaScript to verify a join link.</p></noscript>
       <div id="join-confirmation" hidden>
         <div class="join-player">
           <img id="join-avatar" src="../assets/rt-logo.webp" width="72" height="72" alt="">
           <span id="join-username"></span>
         </div>
-        <p>Do you want to join this player? Roblox will check whether you can join their current session.</p>
+        <p>Ready to join? Roblox will open and check whether you can enter this player’s session.</p>
         <div class="join-actions">
-          <a id="join-launch" class="button">Open Roblox and join</a>
-          <a id="join-profile" class="button secondary">Open Roblox profile</a>
+          <a id="join-launch" class="button">Join in Roblox</a>
+          <a id="join-profile" class="button secondary">View Roblox profile</a>
         </div>
-        <p class="join-note">If the app doesn’t open, use <strong>Join Experience</strong> on the Roblox profile when available.</p>
+        <p class="join-note">If Roblox doesn’t open, look for <strong>Join Experience</strong> on their profile.</p>
         <a class="join-cancel" href="../">Cancel</a>
       </div>
     </section>

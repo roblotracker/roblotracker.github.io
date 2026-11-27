@@ -1,4 +1,5 @@
 const status = document.querySelector("#join-status");
+const feedback = document.querySelector("#join-feedback");
 const confirmation = document.querySelector("#join-confirmation");
 const fallback = "../assets/rt-logo.webp";
 
@@ -17,14 +18,15 @@ function avatarUrl(value) {
   return fallback;
 }
 
-function unavailable() {
+function unavailable(message = "This link is invalid or expired. Run /join-friend list in Discord to get a new one.") {
   confirmation.hidden = true;
-  status.hidden = false;
-  status.textContent = "This join link is missing, invalid, or expired. Request a fresh link in Discord with /join-friend open.";
+  feedback.hidden = false;
+  status.textContent = message;
 }
 
 async function confirmJoin() {
   const fragment = window.location.hash.slice(1);
+  if (!fragment) return unavailable("Open /join-friend list in Discord and choose someone who’s sharing with you.");
   if (!/^[A-Za-z0-9_-]{1,1800}\.[A-Za-z0-9_-]{86}$/.test(fragment)) return unavailable();
   const [data, signature] = fragment.split(".").map(decode);
   const response = await fetch("../assets/join-public-key.json");
@@ -48,9 +50,9 @@ async function confirmJoin() {
     }
   });
   document.querySelector("#join-profile").href = `https://www.roblox.com/users/${userId}/profile`;
-  status.hidden = true;
+  feedback.hidden = true;
   confirmation.hidden = false;
   window.setTimeout(unavailable, Math.max(0, exp * 1000 - Date.now()));
 }
 
-confirmJoin().catch(unavailable);
+confirmJoin().catch(() => unavailable());
