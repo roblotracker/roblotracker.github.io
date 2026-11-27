@@ -199,7 +199,7 @@ section[id] { scroll-margin-top: 1.5rem; }
 .steps h3 { font-size: 1.12rem; margin-bottom: .3rem; }
 .faq { border-top: 1px solid var(--line); }
 .faq details { border-bottom: 1px solid var(--line); }
-.faq summary {
+.faq summary, .command-directory > summary {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -209,8 +209,8 @@ section[id] { scroll-margin-top: 1.5rem; }
   cursor: pointer;
   font-weight: 680;
 }
-.faq summary::-webkit-details-marker { display: none; }
-.faq summary::after {
+.faq summary::-webkit-details-marker, .command-directory > summary::-webkit-details-marker { display: none; }
+.faq summary::after, .command-directory > summary::after {
   content: "";
   flex: 0 0 .48rem;
   height: .48rem;
@@ -220,12 +220,21 @@ section[id] { scroll-margin-top: 1.5rem; }
   transform: translateY(-2px) rotate(45deg);
   transition: transform 220ms ease-in-out;
 }
-.faq details[open]:not(.is-closing) summary::after { transform: translateY(2px) rotate(225deg); }
-.faq summary:hover { color: var(--link); }
+.faq details[open]:not(.is-closing) summary::after,
+.command-directory[open] > summary::after { transform: translateY(2px) rotate(225deg); }
+.faq summary:hover, .command-directory > summary:hover { color: var(--link); }
 .faq-answer p { padding: 0 1.5rem 1.05rem 0; }
 @media (prefers-reduced-motion: reduce) {
-  .faq summary::after { transition: none; }
+  .faq summary::after, .command-directory > summary::after { transition: none; }
 }
+.command-directory > summary {
+  padding-inline: 1rem;
+  background: #182136;
+  border: 1px solid #3b4a70;
+  border-radius: .65rem;
+}
+.command-directory > summary:hover { background: #202d49; }
+.command-directory > .commands { margin-top: .75rem; }
 .support { display: flex; justify-content: space-between; align-items: center; gap: 1.5rem; }
 .support .button { flex: none; }
 

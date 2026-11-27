@@ -11,6 +11,27 @@
     update();
   }
 
+  const directory = document.querySelector(".command-directory");
+  if (directory) {
+    const reveal = hash => {
+      if (!hash.startsWith("#command-")) return;
+      const target = document.getElementById(hash.slice(1));
+      if (target && directory.contains(target)) {
+        directory.open = true;
+        return target;
+      }
+    };
+    const revealCurrent = () => {
+      const target = reveal(location.hash);
+      if (target) requestAnimationFrame(() => target.scrollIntoView());
+    };
+    document.querySelectorAll('a[href^="#command-"]').forEach(link => {
+      link.addEventListener("click", () => reveal(link.hash));
+    });
+    window.addEventListener("hashchange", revealCurrent);
+    revealCurrent();
+  }
+
   document.querySelectorAll(".faq details").forEach(details => {
     const question = details.querySelector("summary");
     const answer = details.querySelector(".faq-answer");
