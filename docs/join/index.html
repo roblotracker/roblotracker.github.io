@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' https://*.rbxcdn.com https://rbxcdn.com; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <meta name="theme-color" content="#0e1119">
+  <title>Join a player | RobloTracker</title>
+  <link rel="icon" type="image/webp" href="../assets/rt-logo.webp">
+  <link rel="stylesheet" href="../assets/site.css?v=install-verify">
+  <link rel="stylesheet" href="../assets/join.css">
+  <script src="../assets/join.js" type="module"></script>
+</head>
+<body class="install-page">
+  <header class="site-header">
+    <div class="wrap top">
+      <a class="brand" href="../"><img src="../assets/rt-logo.webp" alt="" width="34" height="34">RobloTracker</a>
+    </div>
+  </header>
+  <main class="join-layout">
+    <section class="join-panel" aria-labelledby="join-title">
+      <h1 id="join-title">Join a Roblox player</h1>
+      <p id="join-status" role="status">Checking the join link…</p>
+      <noscript><p>Enable JavaScript to verify a join link.</p></noscript>
+      <div id="join-confirmation" hidden>
+        <div class="join-player">
+          <img id="join-avatar" src="../assets/rt-logo.webp" width="72" height="72" alt="">
+          <span id="join-username"></span>
+        </div>
+        <p>Do you want to join this player? Roblox will check whether you can join their current session.</p>
+        <div class="join-actions">
+          <a id="join-launch" class="button">Open Roblox and join</a>
+          <a id="join-profile" class="button secondary">Open Roblox profile</a>
+        </div>
+        <p class="join-note">If the app doesn’t open, use <strong>Join Experience</strong> on the Roblox profile when available.</p>
+        <a class="join-cancel" href="../">Cancel</a>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
