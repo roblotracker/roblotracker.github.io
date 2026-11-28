@@ -266,7 +266,9 @@ function renderServers() {
     return item;
   }));
   const count = filter ? `${entries.length} of ${sharedServers.length}` : entries.length;
-  byId("server-count").textContent = sharedServers.length ? `${count} shared ${sharedServers.length === 1 ? "server" : "servers"}` : "";
+  const countText = sharedServers.length ? `${count} shared ${sharedServers.length === 1 ? "server" : "servers"}` : "";
+  if (byId("server-count").textContent !== countText) byId("server-count").textContent = countText;
+  byId("server-toolbar").hidden = sharedServers.length === 0;
   byId("servers-empty").hidden = sharedServers.length !== 0;
   byId("servers-no-match").hidden = !sharedServers.length || entries.length !== 0;
 }
@@ -657,6 +659,11 @@ signalSelect.addEventListener("change", () => {
 });
 search.addEventListener("input", renderIndex);
 serverSearch.addEventListener("input", renderServers);
+byId("clear-server-search").addEventListener("click", () => {
+  serverSearch.value = "";
+  renderServers();
+  serverSearch.focus();
+});
 for (const button of filterButtons) {
   button.addEventListener("click", () => {
     setTrackerFilter(button.dataset.filter);

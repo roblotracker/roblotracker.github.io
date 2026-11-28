@@ -155,18 +155,18 @@
   background: var(--desk-surface);
 }
 .dashboard-panel p { margin-top: .45rem; }
-.workspace-section-title { display: flex; align-items: end; justify-content: space-between; flex-wrap: wrap; gap: 1rem 2rem; margin-bottom: 1.75rem; }
-.workspace-section-title p { margin-top: .55rem; color: var(--desk-muted); font-size: .92rem; }
-.directory-heading { display: flex; align-items: flex-start; gap: .85rem; min-width: 0; }
-.directory-heading img {
-  flex: none;
-  width: clamp(2.1rem, 3vw, 2.5rem);
-  height: auto;
-  margin-top: .18rem;
-  border-radius: .65rem;
-  background: #bcd7ff;
+.server-library h1 { margin-bottom: 1rem; }
+.server-toolbar {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: .7rem 1.2rem;
+  padding-bottom: 1rem;
+  margin-bottom: 1.2rem;
+  border-bottom: 1px solid var(--desk-line);
 }
-.server-library .workspace-section-title { padding-bottom: 1.2rem; border-bottom: 1px solid var(--desk-line); }
+.server-toolbar p { color: var(--desk-muted); font-size: .92rem; }
 .server-search { flex: 0 1 19rem; }
 .server-search input { width: 100%; }
 .dashboard-empty, #servers-no-match, #servers-empty { padding: 1.25rem; border: 1px dashed #485575; border-radius: .75rem; color: var(--desk-muted); }
@@ -236,7 +236,7 @@
 }
 .server-list a:is(:hover, :focus-visible) .server-card-action { background: #30426c; }
 .server-list a:focus-visible { outline-offset: 3px; }
-#servers-empty .button, #denied > .button { margin-top: .8rem; }
+#servers-empty .button, #servers-no-match .button { margin-top: .8rem; }
 .tracker-toolbar { display: flex; justify-content: space-between; align-items: end; gap: .8rem 1.5rem; flex-wrap: wrap; margin-bottom: 1.4rem; }
 .tracker-toolbar #tracker-server { margin: 0 0 .4rem; color: var(--desk-accent); }
 .tracker-context { display: flex; gap: .9rem; align-items: center; min-width: 0; overflow-wrap: anywhere; }
@@ -424,7 +424,7 @@
   .viewer-chip span { display: none; }
   .workspace-bar { margin-bottom: 1rem; font-size: .78rem; }
   .workspace-content { padding: .95rem 1rem max(2rem, env(safe-area-inset-bottom)); }
-  .workspace-section-title, .tracker-toolbar { align-items: stretch; flex-direction: column; gap: .9rem; }
+  .server-toolbar, .tracker-toolbar { align-items: stretch; flex-direction: column; gap: .75rem; }
   .tracker-search, .server-search { flex: auto; }
   .server-list { grid-template-columns: minmax(0, 1fr); gap: .65rem; }
   .server-list a {
