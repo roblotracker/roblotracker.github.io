@@ -106,6 +106,7 @@ function showPanel(panel) {
     byId("tracker-list").replaceChildren();
     byId("tracker-directory").hidden = true;
     byId("tracker-server").textContent = "";
+    byId("tracker-server-icon").replaceChildren();
     byId("tracker-count").textContent = "";
   }
   if (panel !== "detail") {
@@ -184,15 +185,25 @@ function setImage(image, src) {
   }
 }
 
-function rowImage(src, className, size) {
+function rowImage(src, className, size, fallback) {
   const image = document.createElement("img");
   image.className = className;
   image.alt = "";
   image.width = image.height = size;
   image.loading = "lazy";
   image.decoding = "async";
-  image.addEventListener("error", () => { image.hidden = true; }, { once: true });
+  const showFallback = () => {
+    if (fallback && image.getAttribute("src") !== fallback) {
+      image.classList.add("server-icon-default");
+      image.hidden = false;
+      image.src = fallback;
+    } else {
+      image.hidden = true;
+    }
+  };
+  image.addEventListener("error", showFallback);
   setImage(image, src);
+  if (image.hidden && fallback) showFallback();
   return image;
 }
 
@@ -222,10 +233,15 @@ function renderServers() {
   byId("server-list").replaceChildren(...entries.map(server => {
     const item = document.createElement("li");
     const link = document.createElement("a");
-    const name = document.createElement("span");
+    const name = document.createElement("strong");
+    const action = document.createElement("span");
     link.href = serverRoute(server.id);
+    link.setAttribute("aria-label", `Open ${server.name}`);
     name.textContent = server.name;
-    link.append(rowImage(server.icon, "server-icon", 60), name, rowArrow());
+    name.className = "server-name";
+    action.className = "server-card-action";
+    action.append("Open server", rowArrow());
+    link.append(rowImage(server.icon, "server-icon", 64, "../assets/discord.svg"), name, action);
     item.append(link);
     return item;
   }));
@@ -382,7 +398,9 @@ async function refresh() {
           search.value = "";
           setTrackerFilter("all");
         }
-        byId("tracker-server").textContent = result.data.server?.name || "";
+        const server = result.data.server;
+        byId("tracker-server").textContent = server?.name || "";
+        byId("tracker-server-icon").replaceChildren(rowImage(server?.icon, "server-icon", 48, "../assets/discord.svg"));
         trackers = (result.data.trackers || []).filter(item => snowflake.test(item.channel));
         renderIndex();
         renderViewer(result.viewer, "index", result.data.server?.id, "Trackers");

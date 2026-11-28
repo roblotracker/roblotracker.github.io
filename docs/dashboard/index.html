@@ -10,8 +10,8 @@
   <title>Tracker dashboard | RobloTracker</title>
   <link rel="icon" href="../assets/rt-logo.webp" type="image/webp">
   <link rel="stylesheet" href="../assets/site.css?v=button-feedback">
-  <link rel="stylesheet" href="../assets/dashboard.css?v=sidebar-icons">
-  <script src="../assets/dashboard.js?v=sidebar-icons" type="module"></script>
+  <link rel="stylesheet" href="../assets/dashboard.css?v=server-picker">
+  <script src="../assets/dashboard.js?v=server-picker" type="module"></script>
 </head>
 <body class="dashboard-page">
   <a class="skip" href="#content">Skip to dashboard</a>
@@ -99,11 +99,14 @@
       </div>
       <p id="servers-no-match" hidden>No servers match your search.</p>
     </section>
-    <section id="index" class="dashboard-panel" aria-labelledby="index-title" hidden>
+    <section id="index" aria-labelledby="index-title" hidden>
       <div class="tracker-toolbar">
-        <div>
-          <p id="tracker-server" class="dashboard-note"></p>
-          <h1 id="index-title">Trackers</h1>
+        <div class="tracker-context">
+          <span id="tracker-server-icon"></span>
+          <div>
+            <p id="tracker-server" class="dashboard-note"></p>
+            <h1 id="index-title">Trackers</h1>
+          </div>
         </div>
         <div class="tracker-search">
           <label for="search">Find a Roblox account</label>
