@@ -22,6 +22,8 @@ let searchGuild = null;
 let token;
 let inFlight = false;
 let updateRequested = false;
+let refreshTimer;
+let loadingSince = null;
 let trackers = [];
 let sharedServers = [];
 let activity = [];
@@ -155,13 +157,6 @@ function setTrackerFilter(value) {
   }
 }
 
-function rowArrow() {
-  const arrow = document.createElement("span");
-  arrow.className = "row-arrow";
-  arrow.setAttribute("aria-hidden", "true");
-  return arrow;
-}
-
 function setImage(image, src) {
   let url;
   if (typeof src === "string" && src.startsWith("https://")) {
@@ -222,7 +217,7 @@ function trackerRow(item, guild) {
   state.className = "row-state";
   state.dataset.paused = String(Boolean(item.paused));
   state.textContent = item.paused ? "Paused" : "Monitoring";
-  link.append(rowImage(item.avatar, "tracker-avatar", 44), title, state, rowArrow());
+  link.append(rowImage(item.avatar, "tracker-avatar", 44), title, state);
   li.append(link);
   return li;
 }
@@ -240,7 +235,7 @@ function renderServers() {
     name.textContent = server.name;
     name.className = "server-name";
     action.className = "server-card-action";
-    action.append("Open server", rowArrow());
+    action.textContent = "Open server";
     link.append(rowImage(server.icon, "server-icon", 64, "../assets/discord.svg"), name, action);
     item.append(link);
     return item;
@@ -292,7 +287,7 @@ function activityRow(event) {
   destination.className = "activity-destination";
   destination.setAttribute("aria-hidden", "true");
   destination.textContent = "View in Discord";
-  link.append(description, destination, rowArrow());
+  link.append(description, destination);
   item.append(link);
   return item;
 }
@@ -339,6 +334,8 @@ function renderDetail(tracker, guild, channel) {
 
 function locked(message) {
   setToken(null);
+  clearTimeout(refreshTimer);
+  loadingSince = null;
   rendered = "";
   commandInput.value = "";
   search.value = "";
@@ -354,6 +351,7 @@ function locked(message) {
 
 async function refresh() {
   if (!token || document.hidden) return;
+  clearTimeout(refreshTimer);
   if (inFlight) {
     updateRequested = true;
     return;
@@ -362,10 +360,17 @@ async function refresh() {
   const requestGeneration = generation;
   const route = currentRoute();
   const routeHash = location.hash;
+  let nextRefresh = 5000;
   try {
     const result = await post("/view", route);
     if (generation !== requestGeneration || routeHash !== location.hash || document.hidden) return;
     if (result.state === "expired") return locked("Your session expired. Sign in again or use a new code.");
+    if (result.state === "loading") {
+      loadingSince ??= performance.now();
+      if (performance.now() - loadingSince < 10_000) nextRefresh = 900;
+    } else {
+      loadingSince = null;
+    }
     const marker = `${routeHash}:${result.state}:${result.updated || ""}`;
     if (rendered === marker) return;
     rendered = marker;
@@ -422,6 +427,8 @@ async function refresh() {
     if (updateRequested) {
       updateRequested = false;
       refresh();
+    } else if (token && !document.hidden) {
+      refreshTimer = setTimeout(refresh, nextRefresh);
     }
   }
 }
@@ -561,6 +568,7 @@ document.addEventListener("fullscreenchange", () => {
 });
 window.addEventListener("hashchange", () => {
   if (!token) return;
+  loadingSince = null;
   showPanel(null);
   status.textContent = "Checking your Discord access…";
   rendered = "";
@@ -576,6 +584,7 @@ window.addEventListener("storage", event => {
   refresh();
 });
 window.addEventListener("pagehide", () => {
+  clearTimeout(refreshTimer);
   if (token) showPanel(null);
   rendered = "";
 });
@@ -584,13 +593,13 @@ window.addEventListener("pageshow", event => {
 });
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
+    clearTimeout(refreshTimer);
     if (token) showPanel(null);
     rendered = "";
   } else {
     refresh();
   }
 });
-window.setInterval(() => { if (!document.hidden) refresh(); }, 5000);
 await finishSignIn();
 showSignInOptions();
 if (token) {
