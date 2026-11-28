@@ -9,6 +9,9 @@ const commandInput = byId("pair-command");
 const search = byId("search");
 const serverSearch = byId("server-search");
 const activityType = byId("activity-type");
+const signalSelect = byId("signal-select");
+const trackerTabs = [...document.querySelectorAll(".profile-tabs a")];
+const trackerSections = new Set(trackerTabs.map(tab => tab.dataset.section));
 const content = byId("content");
 const sidebarToggle = byId("sidebar-toggle");
 const fullscreenToggle = byId("fullscreen-toggle");
@@ -65,12 +68,27 @@ function currentRoute() {
   const params = new URLSearchParams(hash);
   const channel = params.get("tracker");
   const guild = params.get("server");
-  return { channel: snowflake.test(channel) ? channel : null, guild: snowflake.test(guild) ? guild : null };
+  const section = params.get("section");
+  const rawPage = params.get("page") || "";
+  const signal = params.get("signal") || "";
+  return {
+    channel: snowflake.test(channel) ? channel : null,
+    guild: snowflake.test(guild) ? guild : null,
+    section: trackerSections.has(section) ? section : "overview",
+    page: /^[1-9]\d{0,4}$/.test(rawPage) && Number(rawPage) <= 10000 ? Number(rawPage) : 1,
+    signal: /^[a-z_]{0,32}$/.test(signal) ? signal : "",
+  };
 }
 
-function serverRoute(guild, channel = null) {
-  if (!guild) return channel ? `#${channel}` : "#";
-  return `#server=${guild}${channel ? `&tracker=${channel}` : ""}`;
+function serverRoute(guild, channel = null, section = "overview", page = 1, signal = "") {
+  if (!guild && !channel) return "#";
+  const params = new URLSearchParams();
+  if (guild) params.set("server", guild);
+  if (channel) params.set("tracker", channel);
+  if (section !== "overview") params.set("section", section);
+  if (page > 1) params.set("page", String(page));
+  if (signal) params.set("signal", signal);
+  return `#${params}`;
 }
 
 async function post(path, data = {}, authorization = token) {
@@ -121,6 +139,9 @@ function showPanel(panel) {
     activity = [];
     byId("activity-controls").hidden = true;
     byId("activity-list").replaceChildren();
+    byId("record-list").replaceChildren();
+    signalSelect.replaceChildren(new Option("All data", ""));
+    byId("tracker-pages").hidden = true;
   }
 }
 
@@ -289,6 +310,21 @@ function activityRow(event) {
   destination.textContent = "View in Discord";
   link.append(description, destination);
   item.append(link);
+  if (event.before || event.after) {
+    const changes = document.createElement("dl");
+    changes.className = "history-change";
+    for (const [label, value] of [["Before", event.before], ["After", event.after]]) {
+      if (typeof value !== "string" || !value) continue;
+      const field = document.createElement("div");
+      const key = document.createElement("dt");
+      const text = document.createElement("dd");
+      key.textContent = label;
+      text.textContent = value;
+      field.append(key, text);
+      changes.append(field);
+    }
+    item.append(changes);
+  }
   return item;
 }
 
@@ -330,6 +366,64 @@ function renderDetail(tracker, guild, channel) {
   activityType.value = kinds.includes(selectedType) ? selectedType : "";
   byId("activity-controls").hidden = kinds.length < 2;
   renderActivity();
+}
+
+function renderTrackerPage(route, data) {
+  const { section = "overview", page = 1, signal = "" } = route;
+  const guild = data.server?.id || route.guild;
+  for (const tab of trackerTabs) {
+    tab.href = serverRoute(guild, route.channel, tab.dataset.section);
+    if (tab.dataset.section === section) tab.setAttribute("aria-current", "page");
+    else tab.removeAttribute("aria-current");
+  }
+  const observations = section === "observations";
+  const history = section === "history";
+  const meta = data.dashboard_page?.section === section && data.dashboard_page.number === page
+    ? data.dashboard_page : null;
+  byId("observations-panel").hidden = !observations;
+  document.querySelector(".profile-activity").hidden = observations;
+  byId("activity-title").textContent = history ? "Alert history" : "Recent activity";
+  if (history) {
+    byId("activity-controls").hidden = true;
+    activityType.value = "";
+    renderActivity();
+    if (!meta) {
+      byId("activity-empty").hidden = false;
+      byId("activity-empty").textContent = "Full history becomes available after the bot is updated. This view shows recent alerts.";
+    }
+  }
+  if (observations) {
+    const signals = Array.isArray(meta?.signals) ? meta.signals : [];
+    signalSelect.replaceChildren(new Option("All data", ""), ...signals.map(item => new Option(item.label, item.key)));
+    signalSelect.value = signals.some(item => item.key === signal) ? signal : "";
+    byId("signal-controls").hidden = signals.length === 0;
+    const records = Array.isArray(meta?.records) ? meta.records : [];
+    byId("record-list").replaceChildren(...records.map(record => {
+      const row = document.createElement("div");
+      const label = document.createElement("dt");
+      const value = document.createElement("dd");
+      label.textContent = record.label;
+      value.textContent = record.value;
+      row.append(label, value);
+      return row;
+    }));
+    byId("record-empty").hidden = records.length !== 0;
+    byId("record-empty").textContent = !meta ? "Saved observations become available after the bot is updated." :
+      meta.total ? "This page has no observations." : "There are no saved observations for this selection.";
+  }
+  const pages = meta && Number.isInteger(meta.total) && Number.isInteger(meta.size) && meta.size > 0
+    ? Math.max(1, Math.min(10000, Math.ceil(meta.total / meta.size))) : 1;
+  byId("tracker-pages").hidden = !meta || (pages <= 1 && page === 1);
+  byId("page-count").textContent = page > pages ? "Page unavailable" : `Page ${page} of ${pages}`;
+  for (const [id, target, hidden] of [
+    ["previous-page", Math.min(pages, page - 1), page <= 1],
+    ["next-page", page + 1, page >= pages],
+  ]) {
+    const link = byId(id);
+    link.hidden = hidden;
+    if (hidden) link.removeAttribute("href");
+    else link.href = serverRoute(guild, route.channel, section, target, signal);
+  }
 }
 
 function locked(message) {
@@ -387,6 +481,7 @@ async function refresh() {
       if (result.data.tracker) {
         showPanel("detail");
         renderDetail(result.data.tracker, result.data.server?.id, route.channel);
+        renderTrackerPage(route, result.data);
         renderViewer(result.viewer, "detail", result.data.server?.id, "Tracker profile");
       } else if (Array.isArray(result.data.servers)) {
         showPanel("servers");
@@ -523,6 +618,10 @@ for (const id of ["account-image", "viewer-avatar"]) {
   byId(id).addEventListener("error", event => { event.currentTarget.hidden = true; });
 }
 activityType.addEventListener("change", renderActivity);
+signalSelect.addEventListener("change", () => {
+  const route = currentRoute();
+  location.hash = serverRoute(route.guild, route.channel, "observations", 1, signalSelect.value);
+});
 search.addEventListener("input", renderIndex);
 serverSearch.addEventListener("input", renderServers);
 for (const button of filterButtons) {

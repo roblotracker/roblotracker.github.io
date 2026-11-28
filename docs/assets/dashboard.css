@@ -295,7 +295,47 @@
 .profile-heading h1 { font-size: clamp(1.55rem, 4vw, 2.35rem); overflow-wrap: anywhere; }
 .profile-heading p { margin-top: .1rem; overflow-wrap: anywhere; }
 .profile-links { display: flex; flex-wrap: wrap; gap: .55rem; }
-.profile-activity { margin-top: 1.55rem; }
+.profile-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .3rem .85rem;
+  margin: 1.1rem 0 1.5rem;
+  border-bottom: 1px solid var(--desk-line);
+}
+.profile-tabs a {
+  min-height: 2.75rem;
+  padding: .55rem .2rem;
+  border-bottom: 2px solid transparent;
+  color: var(--desk-muted);
+  font-weight: 600;
+  text-decoration: none;
+}
+.profile-tabs a:hover, .profile-tabs a[aria-current="page"] { color: var(--ink); }
+.profile-tabs a[aria-current="page"] { border-color: #90aaff; }
+.record-list:not(:empty) {
+  margin-top: .85rem;
+  border: 1px solid var(--desk-line);
+  border-radius: .75rem;
+  background: var(--desk-surface);
+}
+.record-list > div {
+  display: grid;
+  grid-template-columns: minmax(8rem, .38fr) minmax(0, 1fr);
+  gap: .25rem 1rem;
+  padding: .85rem 1rem;
+}
+.record-list > div + div { border-top: 1px solid var(--desk-line); }
+.record-list dt, .history-change dt { color: var(--desk-muted); font-size: .87rem; }
+.record-list dd, .history-change dd { color: var(--ink); overflow-wrap: anywhere; }
+.history-change {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: .7rem;
+  padding: 0 1rem .85rem;
+}
+.history-change > div { padding: .6rem .7rem; border-radius: .5rem; background: #101726; }
+.tracker-pages { display: flex; align-items: center; flex-wrap: wrap; justify-content: center; gap: .75rem; margin-top: 1.1rem; }
+.tracker-pages p { margin: 0; font-size: .9rem; }
 .account-state {
   display: inline-block;
   padding: .1rem .55rem;
@@ -356,6 +396,8 @@
   .server-list a:is(:hover, :focus-visible) .server-card-action { background: transparent; color: white; }
 }
 @media (max-width: 390px) {
+  .record-list > div { grid-template-columns: minmax(0, 1fr); }
+  .profile-tabs a { font-size: .83rem; }
   .viewer-chip { display: none; }
   .rail-nav a, .rail-help { font-size: .8rem; padding-inline: .35rem; }
   .tracker-list a, .tracker-columns { gap: .35rem; }

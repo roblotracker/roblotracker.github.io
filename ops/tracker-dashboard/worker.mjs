@@ -13,6 +13,8 @@ const discordSessionLifetime = 30 * day;
 const maxDiscordSessions = 5000;
 const refreshAge = 8_000;
 const maximumAge = 18_000;
+const trackerSections = new Set(["overview", "observations", "history"]);
+const maxTrackerPage = 10_000;
 const maxSessions = 300;
 const sessionDirectory = "tracker-sessions-oauth";
 const headers = {
@@ -284,6 +286,7 @@ export class DashboardSessions {
           view.job = randomHex(16);
           view.leaseUntil = now + 15_000;
           jobs.push({ job: view.job, guild: view.guild, member: session.member, channel: view.channel,
+            section: view.section, page: view.page, signal: view.signal,
             guilds: session.guilds || null, discover: Boolean(session.discover) });
           if (jobs.length === 8) break queue;
         }
@@ -338,8 +341,15 @@ export class DashboardSessions {
       }
       this.rememberDiscordSession(token, session);
     }
-    const viewKey = `${guild || ""}:${channel || ""}`;
-    const view = session.views.get(viewKey) || { guild, channel };
+    const section = channel ? input.section ?? "overview" : "overview";
+    const page = channel ? input.page ?? 1 : 1;
+    const signal = channel && section === "observations" ? input.signal ?? "" : "";
+    if (!trackerSections.has(section) || !Number.isInteger(page) || page < 1 || page > maxTrackerPage ||
+        typeof signal !== "string" || !/^[a-z_]{0,32}$/.test(signal)) {
+      return reply({ error: "invalid_tracker_page" }, 400);
+    }
+    const viewKey = `${guild || ""}:${channel || ""}:${section}:${page}:${signal}`;
+    const view = session.views.get(viewKey) || { guild, channel, section, page, signal };
     session.views.delete(viewKey);
     session.views.set(viewKey, view);
     if (session.views.size > 8) session.views.delete(session.views.keys().next().value);

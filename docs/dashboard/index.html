@@ -10,8 +10,8 @@
   <title>Tracker dashboard | RobloTracker</title>
   <link rel="icon" href="../assets/rt-logo.webp" type="image/webp">
   <link rel="stylesheet" href="../assets/site.css?v=button-feedback">
-  <link rel="stylesheet" href="../assets/dashboard.css?v=tracker-view">
-  <script src="../assets/dashboard.js?v=tracker-view" type="module"></script>
+  <link rel="stylesheet" href="../assets/dashboard.css?v=tracker-records">
+  <script src="../assets/dashboard.js?v=tracker-records" type="module"></script>
 </head>
 <body class="dashboard-page">
   <a class="skip" href="#content">Skip to dashboard</a>
@@ -147,6 +147,11 @@
           <div><dt>Last observed</dt><dd id="last-checked"></dd></div>
         </dl>
       </header>
+      <nav class="profile-tabs" aria-label="Tracker sections">
+        <a data-section="overview">Overview</a>
+        <a data-section="observations">Saved observations</a>
+        <a data-section="history">Alert history</a>
+      </nav>
       <section class="profile-activity" aria-labelledby="activity-title">
         <div class="activity-toolbar">
           <h2 id="activity-title">Recent activity</h2>
@@ -158,6 +163,22 @@
         <ul id="activity-list" class="activity-list"></ul>
         <p id="activity-empty" hidden>No delivered alerts in this channel yet.</p>
       </section>
+      <section id="observations-panel" aria-labelledby="observations-title" hidden>
+        <div class="activity-toolbar">
+          <h2 id="observations-title">Saved observations</h2>
+          <div id="signal-controls" hidden>
+            <label for="signal-select">Data type</label>
+            <select id="signal-select"><option value="">All data</option></select>
+          </div>
+        </div>
+        <dl id="record-list" class="record-list"></dl>
+        <p id="record-empty" class="dashboard-empty" hidden></p>
+      </section>
+      <nav id="tracker-pages" class="tracker-pages" aria-label="Tracker pages" hidden>
+        <a id="previous-page" class="button small secondary" hidden>Previous</a>
+        <p id="page-count"></p>
+        <a id="next-page" class="button small secondary" hidden>Next</a>
+      </nav>
     </section>
     <section id="denied" class="dashboard-panel" hidden>
       <h1>Tracker unavailable</h1>
