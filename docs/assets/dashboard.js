@@ -8,6 +8,7 @@ const status = byId("dashboard-status");
 const commandInput = byId("pair-command");
 const search = byId("search");
 const serverSearch = byId("server-search");
+const activityType = byId("activity-type");
 const content = byId("content");
 const sidebarToggle = byId("sidebar-toggle");
 const fullscreenToggle = byId("fullscreen-toggle");
@@ -23,6 +24,8 @@ let inFlight = false;
 let updateRequested = false;
 let trackers = [];
 let sharedServers = [];
+let activity = [];
+let activityChannel = null;
 let rendered = "";
 let generation = 0;
 
@@ -107,8 +110,13 @@ function showPanel(panel) {
   }
   if (panel !== "detail") {
     for (const id of ["account-name", "account-handle", "account-state", "last-checked", "account-game"]) byId(id).textContent = "";
-    byId("account-profile").removeAttribute("href");
-    byId("account-image").src = "../assets/rt-logo.webp";
+    for (const id of ["account-profile", "account-channel"]) {
+      byId(id).hidden = true;
+      byId(id).removeAttribute("href");
+    }
+    setImage(byId("account-image"), null);
+    activity = [];
+    byId("activity-controls").hidden = true;
     byId("activity-list").replaceChildren();
   }
 }
@@ -118,7 +126,7 @@ function renderViewer(viewer, panel, guild, locationLabel) {
   account.hidden = !viewer;
   byId("viewer-name").textContent = viewer?.name || "";
   account.title = viewer?.username ? `Discord · @${viewer.username}` : "";
-  byId("viewer-avatar").src = viewer?.avatar || "../assets/discord.svg";
+  setImage(byId("viewer-avatar"), viewer?.avatar);
   byId("lock").textContent = viewer ? "Sign out" : "Lock";
   const serversBack = byId("servers-back");
   serversBack.hidden = !viewer || !panel || panel === "access";
@@ -153,15 +161,25 @@ function rowArrow() {
   return arrow;
 }
 
-function rowImage(src, fallback, className, size) {
+function setImage(image, src) {
+  if (!src) {
+    image.hidden = true;
+    image.removeAttribute("src");
+  } else if (image.getAttribute("src") !== src) {
+    image.hidden = false;
+    image.src = src;
+  }
+}
+
+function rowImage(src, className, size) {
   const image = document.createElement("img");
   image.className = className;
   image.alt = "";
   image.width = image.height = size;
   image.loading = "lazy";
   image.decoding = "async";
-  image.addEventListener("error", () => { image.src = fallback; }, { once: true });
-  image.src = src || fallback;
+  image.addEventListener("error", () => { image.hidden = true; }, { once: true });
+  setImage(image, src);
   return image;
 }
 
@@ -180,7 +198,7 @@ function trackerRow(item, guild) {
   state.className = "row-state";
   state.dataset.paused = String(Boolean(item.paused));
   state.textContent = item.paused ? "Paused" : "Monitoring";
-  link.append(rowImage(item.avatar, "../assets/rt-logo.webp", "tracker-avatar", 44), title, state, rowArrow());
+  link.append(rowImage(item.avatar, "tracker-avatar", 44), title, state, rowArrow());
   li.append(link);
   return li;
 }
@@ -194,7 +212,7 @@ function renderServers() {
     const name = document.createElement("span");
     link.href = serverRoute(server.id);
     name.textContent = server.name;
-    link.append(rowImage(server.icon, "../assets/discord.svg", "server-icon", 60), name, rowArrow());
+    link.append(rowImage(server.icon, "server-icon", 60), name, rowArrow());
     item.append(link);
     return item;
   }));
@@ -225,6 +243,11 @@ const signalLabels = {
   username: "Username change", display_name: "Display name change", description: "Bio change",
 };
 
+function activityLabel(kind) {
+  return Object.hasOwn(signalLabels, kind) ? signalLabels[kind] :
+    (kind || "Update").replaceAll("_", " ").replace(/^./, letter => letter.toUpperCase());
+}
+
 function activityRow(event) {
   const item = document.createElement("li");
   const link = document.createElement("a");
@@ -232,17 +255,27 @@ function activityRow(event) {
   const title = document.createElement("strong");
   const date = document.createElement("time");
   link.href = event.link;
-  title.textContent = signalLabels[event.kind] ||
-    (event.kind || "Update").replaceAll("_", " ").replace(/^./, letter => letter.toUpperCase());
+  title.textContent = activityLabel(event.kind);
   if (!Number.isNaN(Date.parse(event.when))) date.dateTime = event.when;
   date.textContent = timeText(event.when);
   description.append(title, date);
-  link.append(description, rowArrow());
+  const destination = document.createElement("span");
+  destination.className = "activity-destination";
+  destination.setAttribute("aria-hidden", "true");
+  destination.textContent = "View in Discord";
+  link.append(description, destination, rowArrow());
   item.append(link);
   return item;
 }
 
-function renderDetail(tracker) {
+function renderActivity() {
+  const matches = activityType.value ? activity.filter(event => event.kind === activityType.value) : activity;
+  byId("activity-list").replaceChildren(...matches.map(activityRow));
+  byId("activity-empty").hidden = matches.length > 0;
+  byId("activity-empty").textContent = activity.length ? "No alerts of this type." : "No delivered alerts in this channel yet.";
+}
+
+function renderDetail(tracker, guild, channel) {
   byId("account-name").textContent = tracker.name || tracker.username;
   byId("account-handle").textContent = `@${tracker.username}`;
   const state = byId("account-state");
@@ -256,12 +289,23 @@ function renderDetail(tracker) {
   profile.hidden = !/^https:\/\/www\.roblox\.com\/users\/[1-9][0-9]{0,18}\/profile$/.test(tracker.profile || "");
   if (profile.hidden) profile.removeAttribute("href");
   else profile.href = tracker.profile;
-  const image = byId("account-image");
-  image.src = tracker.avatar || "../assets/rt-logo.webp";
-  const events = (tracker.activity || []).filter(event =>
-    /^https:\/\/discord\.com\/channels\/\d+\/\d+\/\d+$/.test(event.link || ""));
-  byId("activity-list").replaceChildren(...events.map(activityRow));
-  byId("activity-empty").hidden = events.length > 0;
+  setImage(byId("account-image"), tracker.avatar);
+  const channelLink = byId("account-channel");
+  channelLink.hidden = !snowflake.test(guild) || !snowflake.test(channel);
+  if (channelLink.hidden) channelLink.removeAttribute("href");
+  else channelLink.href = `https://discord.com/channels/${guild}/${channel}`;
+  const selectedType = activityChannel === channel ? activityType.value : "";
+  activityChannel = channel;
+  const channelPrefix = channelLink.hidden ? "" : channelLink.href + "/";
+  activity = (tracker.activity || []).filter(event =>
+    typeof event?.kind === "string" && /^https:\/\/discord\.com\/channels\/\d+\/\d+\/\d+$/.test(event.link || "") &&
+    event.link.startsWith(channelPrefix))
+    .sort((left, right) => (Date.parse(right.when) || 0) - (Date.parse(left.when) || 0));
+  const kinds = [...new Set(activity.map(event => event.kind))].sort((a, b) => activityLabel(a).localeCompare(activityLabel(b)));
+  activityType.replaceChildren(new Option("All alerts", ""), ...kinds.map(kind => new Option(activityLabel(kind), kind)));
+  activityType.value = kinds.includes(selectedType) ? selectedType : "";
+  byId("activity-controls").hidden = kinds.length < 2;
+  renderActivity();
 }
 
 function locked(message) {
@@ -308,7 +352,7 @@ async function refresh() {
       status.textContent = `Updated ${timeText(result.updated)}`;
       if (result.data.tracker) {
         showPanel("detail");
-        renderDetail(result.data.tracker);
+        renderDetail(result.data.tracker, result.data.server?.id, route.channel);
         renderViewer(result.viewer, "detail", result.data.server?.id, "Tracker profile");
       } else if (Array.isArray(result.data.servers)) {
         showPanel("servers");
@@ -437,14 +481,10 @@ byId("copy").addEventListener("click", async () => {
     commandInput.select();
   }
 });
-byId("account-image").addEventListener("error", event => {
-  const image = event.currentTarget;
-  if (!image.src.endsWith("/rt-logo.webp")) image.src = "../assets/rt-logo.webp";
-});
-byId("viewer-avatar").addEventListener("error", event => {
-  const image = event.currentTarget;
-  if (!image.src.endsWith("/discord.svg")) image.src = "../assets/discord.svg";
-});
+for (const id of ["account-image", "viewer-avatar"]) {
+  byId(id).addEventListener("error", event => { event.currentTarget.hidden = true; });
+}
+activityType.addEventListener("change", renderActivity);
 search.addEventListener("input", renderIndex);
 serverSearch.addEventListener("input", renderServers);
 for (const button of filterButtons) {

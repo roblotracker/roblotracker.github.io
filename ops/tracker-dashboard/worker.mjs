@@ -8,6 +8,9 @@ const codePattern = /^[A-F0-9]{16}$/;
 const tokenPattern = /^[a-f0-9]{64}$/;
 const pairingLifetime = 5 * 60_000;
 const sessionLifetime = 20 * 60_000;
+const day = 86_400_000;
+const discordSessionLifetime = 30 * day;
+const maxDiscordSessions = 5000;
 const refreshAge = 8_000;
 const maximumAge = 18_000;
 const maxSessions = 300;
@@ -28,6 +31,11 @@ function reply(value, status = 200) {
 
 function randomHex(length) {
   return Array.from(crypto.getRandomValues(new Uint8Array(length)), byte => byte.toString(16).padStart(2, "0")).join("");
+}
+
+async function sessionDigest(token) {
+  const bytes = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(token));
+  return Array.from(new Uint8Array(bytes), byte => byte.toString(16).padStart(2, "0")).join("");
 }
 
 function oauthReturn(value) {
@@ -131,11 +139,47 @@ export default {
 };
 
 export class DashboardSessions {
-  constructor() {
+  constructor(state) {
+    this.storage = state.storage;
+    this.sql = this.storage.sql;
+    this.sql.exec(`CREATE TABLE IF NOT EXISTS discord_sessions (
+      digest TEXT PRIMARY KEY, identity TEXT NOT NULL, expires INTEGER NOT NULL
+    )`);
+    this.sql.exec("CREATE INDEX IF NOT EXISTS discord_sessions_expiry ON discord_sessions(expires)");
     this.sessions = new Map();
+    this.discordSessions = new Map();
     this.codes = new Map();
     this.oauthAttempts = new Map();
     this.handoffs = new Map();
+  }
+
+  async alarm() {
+    const now = Date.now();
+    this.sql.exec("DELETE FROM discord_sessions WHERE expires <= ?", now);
+    const [{ expires }] = this.sql.exec("SELECT MIN(expires) AS expires FROM discord_sessions").toArray();
+    if (expires !== null) await this.storage.setAlarm(expires);
+  }
+
+  rememberDiscordSession(token, session) {
+    this.discordSessions.delete(token);
+    this.discordSessions.set(token, session);
+    if (this.discordSessions.size > maxSessions) {
+      this.discordSessions.delete(this.discordSessions.keys().next().value);
+    }
+  }
+
+  async loadDiscordSession(token, now) {
+    const cached = this.discordSessions.get(token);
+    if (cached && cached.expires > now) return cached;
+    const digest = await sessionDigest(token);
+    const [stored] = this.sql.exec(
+      "SELECT identity, expires FROM discord_sessions WHERE digest = ? AND expires > ?", digest, Date.now(),
+    ).toArray();
+    if (!stored) return null;
+    const { id, guilds, ...viewer } = JSON.parse(stored.identity);
+    const session = { member: id, guilds, viewer, digest, expires: stored.expires, views: new Map() };
+    this.rememberDiscordSession(token, session);
+    return session;
   }
 
   deleteSession(token, session) {
@@ -188,10 +232,17 @@ export class DashboardSessions {
         return reply({ error: "invalid_handoff" }, 403);
       }
       this.handoffs.delete(input.handoff);
-      if (this.sessions.size >= maxSessions) return reply({ error: "busy" }, 429);
       const token = randomHex(32);
+      const digest = await sessionDigest(token);
+      this.sql.exec("DELETE FROM discord_sessions WHERE expires <= ?", now);
+      const [{ total }] = this.sql.exec("SELECT COUNT(*) AS total FROM discord_sessions").toArray();
+      if (total >= maxDiscordSessions) return reply({ error: "busy" }, 429);
+      const expires = now + discordSessionLifetime;
+      this.sql.exec("INSERT INTO discord_sessions VALUES (?, ?, ?)", digest, JSON.stringify(handoff.account), expires);
       const { id, guilds, ...viewer } = handoff.account;
-      this.sessions.set(token, { member: id, guilds, viewer, expires: now + sessionLifetime, views: new Map() });
+      this.rememberDiscordSession(token, { member: id, guilds, viewer, digest, expires, views: new Map() });
+      const alarm = await this.storage.getAlarm();
+      if (alarm === null || expires < alarm) await this.storage.setAlarm(expires);
       return reply({ token });
     }
     if (path === "/pair") {
@@ -225,7 +276,8 @@ export class DashboardSessions {
     }
     if (path === "/bot/jobs") {
       const jobs = [];
-      queue: for (const session of this.sessions.values()) {
+      queue: for (const session of [...this.sessions.values(), ...this.discordSessions.values()]) {
+        if (session.expires <= now) continue;
         if (!session.views) continue;
         for (const view of session.views.values()) {
           if (!view.wanted || now - view.wanted > 30_000 || view.leaseUntil > now) continue;
@@ -239,7 +291,8 @@ export class DashboardSessions {
       return reply({ jobs });
     }
     if (path === "/bot/result") {
-      for (const session of this.sessions.values()) {
+      for (const session of [...this.sessions.values(), ...this.discordSessions.values()]) {
+        if (session.expires <= now) continue;
         for (const view of session.views?.values() || []) {
           if (!view.job || view.job !== input.job) continue;
           view.job = null;
@@ -254,10 +307,15 @@ export class DashboardSessions {
     }
     const auth = request.headers.get("Authorization") || "";
     const token = auth.startsWith("Bearer ") ? auth.slice(7) : "";
-    const session = tokenPattern.test(token) && this.sessions.get(token);
+    const session = tokenPattern.test(token) && (this.sessions.get(token) || await this.loadDiscordSession(token, now));
     if (!session || session.expires <= Date.now()) return reply({ error: "expired" }, 401);
     if (path === "/lock") {
-      this.deleteSession(token, session);
+      if (session.digest) {
+        this.sql.exec("DELETE FROM discord_sessions WHERE digest = ?", session.digest);
+        this.discordSessions.delete(token);
+      } else {
+        this.deleteSession(token, session);
+      }
       return reply({ locked: true });
     }
     if (!session.member) return reply({ state: "pending", code: session.code });
@@ -272,6 +330,13 @@ export class DashboardSessions {
         return reply({ state: "denied", viewer: session.viewer });
       }
       guild = input.guild;
+    }
+    if (session.digest) {
+      if (session.expires <= now + discordSessionLifetime - day) {
+        session.expires = now + discordSessionLifetime;
+        this.sql.exec("UPDATE discord_sessions SET expires = ? WHERE digest = ?", session.expires, session.digest);
+      }
+      this.rememberDiscordSession(token, session);
     }
     const viewKey = `${guild || ""}:${channel || ""}`;
     const view = session.views.get(viewKey) || { guild, channel };
