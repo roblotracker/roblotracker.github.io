@@ -10,8 +10,8 @@
   <title>Tracker dashboard | RobloTracker</title>
   <link rel="icon" href="../assets/rt-logo.webp" type="image/webp">
   <link rel="stylesheet" href="../assets/site.css?v=button-feedback">
-  <link rel="stylesheet" href="../assets/dashboard.css?v=tracker-records">
-  <script src="../assets/dashboard.js?v=tracker-records" type="module"></script>
+  <link rel="stylesheet" href="../assets/dashboard.css?v=tracker-navigation">
+  <script src="../assets/dashboard.js?v=tracker-navigation" type="module"></script>
 </head>
 <body class="dashboard-page">
   <a class="skip" href="#content">Skip to dashboard</a>
@@ -181,9 +181,12 @@
       </nav>
     </section>
     <section id="denied" class="dashboard-panel" hidden>
-      <h1>Tracker unavailable</h1>
-      <p>Open the tracker’s Discord channel to check your access. The dashboard requires permission to view the channel and read its history.</p>
-      <a href="#" class="button secondary">Back to dashboard</a>
+      <h1 id="unavailable-title">Tracker unavailable</h1>
+      <p id="unavailable-details">Use the Discord account that can view the tracker channel and read its message history.</p>
+      <div class="unavailable-actions">
+        <a id="unavailable-back" href="#" class="button secondary">Back to dashboard</a>
+        <button id="retry-view" type="button" class="button secondary">Try again</button>
+      </div>
     </section>
     </div>
   </main>

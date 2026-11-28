@@ -26,6 +26,7 @@ let token;
 let inFlight = false;
 let updateRequested = false;
 let refreshTimer;
+let viewRequest;
 let loadingSince = null;
 let trackers = [];
 let sharedServers = [];
@@ -91,7 +92,8 @@ function serverRoute(guild, channel = null, section = "overview", page = 1, sign
   return `#${params}`;
 }
 
-async function post(path, data = {}, authorization = token) {
+async function post(path, data = {}, authorization = token, requestSignal) {
+  const timeout = AbortSignal.timeout(8000);
   const response = await fetch(api + path, {
     method: "POST",
     cache: "no-store",
@@ -101,7 +103,7 @@ async function post(path, data = {}, authorization = token) {
       ...(authorization ? { Authorization: `Bearer ${authorization}` } : {}),
     },
     body: JSON.stringify(data),
-    signal: AbortSignal.timeout(8000),
+    signal: requestSignal && AbortSignal.any ? AbortSignal.any([timeout, requestSignal]) : timeout,
   });
   if (response.status === 401) return { state: "expired" };
   if (!response.ok) throw new Error("Dashboard request failed");
@@ -427,6 +429,7 @@ function renderTrackerPage(route, data) {
 }
 
 function locked(message) {
+  viewRequest?.abort();
   setToken(null);
   clearTimeout(refreshTimer);
   loadingSince = null;
@@ -443,6 +446,28 @@ function locked(message) {
   status.textContent = message;
 }
 
+function showLoading(route) {
+  showPanel(null);
+  if (route.channel) {
+    const tab = trackerTabs.find(item => item.dataset.section === route.section);
+    status.textContent = tab && route.section !== "overview" ? `Loading ${tab.textContent.toLowerCase()}…` : "Loading tracker…";
+  } else {
+    status.textContent = route.guild ? "Loading trackers…" : "Loading servers…";
+  }
+}
+
+function showUnavailable(route, viewer) {
+  showPanel("denied");
+  renderViewer(viewer, "denied", route.guild, route.channel ? "Tracker" : "Servers");
+  status.textContent = "";
+  byId("unavailable-title").textContent = route.channel ? "Tracker unavailable" : "Server unavailable";
+  byId("unavailable-details").textContent = route.channel ?
+    "Use the Discord account that can view this tracker channel and read its message history." :
+    "Use a Discord account that shares this server with RobloTracker.";
+  byId("unavailable-back").href = serverRoute(route.channel ? route.guild : null);
+  byId("unavailable-back").textContent = route.channel && route.guild ? "Back to trackers" : "Back to servers";
+}
+
 async function refresh() {
   if (!token || document.hidden) return;
   clearTimeout(refreshTimer);
@@ -454,9 +479,11 @@ async function refresh() {
   const requestGeneration = generation;
   const route = currentRoute();
   const routeHash = location.hash;
+  const request = new AbortController();
+  viewRequest = request;
   let nextRefresh = 5000;
   try {
-    const result = await post("/view", route);
+    const result = await post("/view", route, token, request.signal);
     if (generation !== requestGeneration || routeHash !== location.hash || document.hidden) return;
     if (result.state === "expired") return locked("Your session expired. Sign in again or use a new code.");
     if (result.state === "loading") {
@@ -506,18 +533,17 @@ async function refresh() {
         renderViewer(result.viewer, "index", result.data.server?.id, "Trackers");
       }
     } else {
-      const panel = result.state === "denied" ? "denied" : null;
-      showPanel(panel);
-      renderViewer(result.viewer, panel);
-      status.textContent = result.state === "denied" ? "This channel couldn’t be verified." : "Checking your Discord access…";
+      if (result.state === "denied") showUnavailable(route, result.viewer);
+      else showLoading(route);
     }
   } catch {
-    if (generation === requestGeneration) {
+    if (!request.signal.aborted && generation === requestGeneration && routeHash === location.hash && !document.hidden) {
       rendered = "";
       showPanel(null);
       status.textContent = "Connection interrupted. Reconnecting…";
     }
   } finally {
+    if (viewRequest === request) viewRequest = null;
     inFlight = false;
     if (updateRequested) {
       updateRequested = false;
@@ -667,9 +693,9 @@ document.addEventListener("fullscreenchange", () => {
 });
 window.addEventListener("hashchange", () => {
   if (!token) return;
+  viewRequest?.abort();
   loadingSince = null;
-  showPanel(null);
-  status.textContent = "Checking your Discord access…";
+  showLoading(currentRoute());
   rendered = "";
   refresh();
 });
@@ -677,13 +703,15 @@ window.addEventListener("storage", event => {
   if (event.key !== storageKey || event.newValue === token) return;
   if (!event.newValue) return locked("Your dashboard is locked.");
   token = event.newValue;
+  viewRequest?.abort();
   generation += 1;
   rendered = "";
-  showPanel(null);
+  showLoading(currentRoute());
   refresh();
 });
 window.addEventListener("pagehide", () => {
   clearTimeout(refreshTimer);
+  viewRequest?.abort();
   if (token) showPanel(null);
   rendered = "";
 });
@@ -693,6 +721,7 @@ window.addEventListener("pageshow", event => {
 document.addEventListener("visibilitychange", () => {
   if (document.hidden) {
     clearTimeout(refreshTimer);
+    viewRequest?.abort();
     if (token) showPanel(null);
     rendered = "";
   } else {
@@ -702,7 +731,11 @@ document.addEventListener("visibilitychange", () => {
 await finishSignIn();
 showSignInOptions();
 if (token) {
-  showPanel(null);
-  status.textContent = "Checking your Discord access…";
+  showLoading(currentRoute());
   refresh();
 }
+byId("retry-view").addEventListener("click", () => {
+  rendered = "";
+  showLoading(currentRoute());
+  refresh();
+});

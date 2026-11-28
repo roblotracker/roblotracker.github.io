@@ -124,7 +124,15 @@
 #workspace-location { display: flex; align-items: center; gap: .55rem; overflow-wrap: anywhere; }
 #location-name { color: #e2ebff; font-weight: 620; }
 #dashboard-status:empty { display: none; }
-.workspace-loading { display: none; max-width: 78rem; margin-inline: auto; }
+.workspace-loading {
+  display: none;
+  max-width: 78rem;
+  margin-inline: auto;
+  padding: clamp(1rem, 3vw, 1.75rem);
+  border: 1px solid var(--desk-line);
+  border-radius: .85rem;
+  background: #121926;
+}
 .dashboard[data-panel="loading"] .workspace-loading { display: grid; gap: .65rem; }
 .workspace-loading span {
   height: 3.5rem;
@@ -133,6 +141,10 @@
   background: #151d2d;
 }
 .workspace-loading span:first-child { width: min(17rem, 78%); height: 1.6rem; margin-bottom: .4rem; }
+@media (prefers-reduced-motion: no-preference) {
+  .workspace-loading span { animation: loading-fade 1.4s ease-in-out infinite alternate; }
+  @keyframes loading-fade { to { opacity: .55; } }
+}
 .dashboard h1 { font-size: clamp(1.9rem, 5vw, 3rem); line-height: 1.07; }
 .dashboard h2 { font-size: clamp(1.12rem, 3vw, 1.4rem); }
 .dashboard-panel {
@@ -298,20 +310,27 @@
 .profile-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: .3rem .85rem;
+  gap: .3rem;
+  width: fit-content;
+  max-width: 100%;
   margin: 1.1rem 0 1.5rem;
-  border-bottom: 1px solid var(--desk-line);
+  padding: .25rem;
+  border: 1px solid var(--desk-line);
+  border-radius: .65rem;
+  background: #111827;
 }
 .profile-tabs a {
   min-height: 2.75rem;
-  padding: .55rem .2rem;
-  border-bottom: 2px solid transparent;
+  padding: .55rem .7rem;
+  border-radius: .45rem;
   color: var(--desk-muted);
   font-weight: 600;
   text-decoration: none;
 }
 .profile-tabs a:hover, .profile-tabs a[aria-current="page"] { color: var(--ink); }
-.profile-tabs a[aria-current="page"] { border-color: #90aaff; }
+.profile-tabs a[aria-current="page"] { background: #283655; }
+.unavailable-actions { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1rem; }
+#denied { max-width: 47rem; }
 .record-list:not(:empty) {
   margin-top: .85rem;
   border: 1px solid var(--desk-line);
