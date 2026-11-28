@@ -99,6 +99,9 @@ section[id] { scroll-margin-top: 1.5rem; }
   transition: background-color .16s, border-color .16s;
 }
 .button:hover { background: #264ce6; border-color: #8aa2ff; }
+.button:not(:disabled) { cursor: pointer; }
+.button:disabled { cursor: not-allowed; }
+.button:focus-visible { outline: 2px solid #a4bcff; outline-offset: 4px; }
 .button.secondary { background: transparent; border-color: #505b7b; }
 .button.secondary:hover { background: #ffffff10; border-color: #8696c4; }
 .button img { width: 1.25rem; height: 1.25rem; flex: none; }
@@ -296,6 +299,17 @@ section[id] { scroll-margin-top: 1.5rem; }
 
 @media (prefers-reduced-motion: reduce) {
   .button { transition: none; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .button:not(:disabled) {
+    transition: transform .16s ease, background-color .16s, border-color .16s, filter .16s;
+  }
+  .button:not(:disabled):active { transform: scale(.97); }
+}
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .button:not(:disabled):hover { transform: translateY(-2px); filter: brightness(1.07); }
+  .button:not(:disabled):hover:active { transform: scale(.97); }
 }
 
 .landing-page .hero-logo { width: clamp(68px, 7vw, 88px); margin-bottom: 1.05rem; }
