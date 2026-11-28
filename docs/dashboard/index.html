@@ -10,8 +10,8 @@
   <title>Tracker dashboard | RobloTracker</title>
   <link rel="icon" href="../assets/rt-logo.webp" type="image/webp">
   <link rel="stylesheet" href="../assets/site.css?v=button-feedback">
-  <link rel="stylesheet" href="../assets/dashboard.css?v=button-feedback">
-  <script src="../assets/dashboard.js?v=wide-workspace" type="module"></script>
+  <link rel="stylesheet" href="../assets/dashboard.css?v=server-library">
+  <script src="../assets/dashboard.js?v=server-library" type="module"></script>
 </head>
 <body class="dashboard-page">
   <a class="skip" href="#content">Skip to dashboard</a>
@@ -33,11 +33,13 @@
   </header>
   <main class="dashboard" id="content" data-panel="access" data-sidebar="expanded" tabindex="-1">
     <aside class="workspace-rail" id="workspace-rail">
+      <div class="rail-content">
       <nav class="rail-nav" aria-label="Dashboard navigation" id="workspace-nav" hidden>
         <a href="#" id="servers-back" aria-label="Servers" title="Servers" hidden><span class="rail-mark rail-servers" aria-hidden="true"></span><span class="rail-label">Servers</span></a>
         <a href="#" id="trackers-back" aria-label="Trackers" title="Trackers" hidden><span class="rail-mark rail-trackers" aria-hidden="true"></span><span class="rail-label">Trackers</span></a>
       </nav>
       <a class="rail-help" href="../#commands" aria-label="Command guide" title="Command guide"><span class="rail-mark rail-guide" aria-hidden="true"></span><span class="rail-label">Command guide</span></a>
+      </div>
     </aside>
     <div class="workspace-content">
       <div class="workspace-bar">
@@ -70,16 +72,20 @@
         <img src="../assets/rt-logo.webp" width="176" height="176" alt="">
       </div>
     </section>
-    <section id="servers" class="dashboard-panel" aria-labelledby="servers-title" hidden>
+    <section id="servers" class="server-library" aria-labelledby="servers-title" hidden>
       <header class="workspace-section-title">
-        <h1 id="servers-title">Your servers</h1>
-        <p id="server-count"></p>
+        <div><h1 id="servers-title">Your servers</h1><p id="server-count" role="status"></p></div>
+        <div class="server-search">
+          <label for="server-search">Find a server</label>
+          <input id="server-search" type="search" placeholder="Search by name" autocomplete="off">
+        </div>
       </header>
       <ul id="server-list" class="server-list"></ul>
       <div id="servers-empty" hidden>
         <p>You don’t share any tracking servers with RobloTracker yet.</p>
         <a href="../install/" class="button secondary">Add to Discord</a>
       </div>
+      <p id="servers-no-match" hidden>No servers match your search.</p>
     </section>
     <section id="index" class="dashboard-panel" aria-labelledby="index-title" hidden>
       <div class="tracker-toolbar">
@@ -104,7 +110,7 @@
         <div class="tracker-columns" aria-hidden="true"><span>Roblox account</span><span>Tracker status</span></div>
         <ul id="tracker-list" class="tracker-list"></ul>
       </div>
-      <p id="index-empty" hidden>No trackers match your search.</p>
+      <p id="index-empty" class="dashboard-empty" hidden>No trackers match your search.</p>
     </section>
     <section id="detail" class="dashboard-panel" aria-labelledby="account-name" hidden>
       <header class="profile-panel">
@@ -130,7 +136,7 @@
     </section>
     <section id="denied" class="dashboard-panel" hidden>
       <h1>Tracker unavailable</h1>
-      <p>Check that you can open the tracker’s Discord channel and read its message history.</p>
+      <p>Open the tracker’s Discord channel to check your access. The dashboard requires permission to view the channel and read its history.</p>
       <a href="#" class="button secondary">Back to dashboard</a>
     </section>
     </div>

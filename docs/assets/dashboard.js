@@ -7,6 +7,7 @@ const byId = id => document.getElementById(id);
 const status = byId("dashboard-status");
 const commandInput = byId("pair-command");
 const search = byId("search");
+const serverSearch = byId("server-search");
 const content = byId("content");
 const sidebarToggle = byId("sidebar-toggle");
 const fullscreenToggle = byId("fullscreen-toggle");
@@ -21,6 +22,7 @@ let token;
 let inFlight = false;
 let updateRequested = false;
 let trackers = [];
+let sharedServers = [];
 let rendered = "";
 let generation = 0;
 
@@ -34,6 +36,7 @@ try {
 function updateSidebar() {
   const collapsed = narrowViewport.matches ? mobileCollapsed : desktopCollapsed;
   content.dataset.sidebar = collapsed ? "collapsed" : "expanded";
+  byId("workspace-rail").inert = narrowViewport.matches && collapsed;
   const description = collapsed ? "Expand sidebar" : "Collapse sidebar";
   sidebarToggle.setAttribute("aria-expanded", String(!collapsed));
   sidebarToggle.setAttribute("aria-label", description);
@@ -90,10 +93,17 @@ function showPanel(panel) {
   byId("location-name").textContent = "";
   for (const id of ["access", "servers", "index", "detail", "denied"]) byId(id).hidden = id !== panel;
   byId("lock").hidden = !token;
-  if (panel !== "servers") byId("server-list").replaceChildren();
+  if (panel !== "servers") {
+    sharedServers = [];
+    byId("server-list").replaceChildren();
+    byId("server-count").textContent = "";
+  }
   if (panel !== "index") {
     trackers = [];
     byId("tracker-list").replaceChildren();
+    byId("tracker-directory").hidden = true;
+    byId("tracker-server").textContent = "";
+    byId("tracker-count").textContent = "";
   }
   if (panel !== "detail") {
     for (const id of ["account-name", "account-handle", "account-state", "last-checked", "account-game"]) byId(id).textContent = "";
@@ -143,51 +153,55 @@ function rowArrow() {
   return arrow;
 }
 
+function rowImage(src, fallback, className, size) {
+  const image = document.createElement("img");
+  image.className = className;
+  image.alt = "";
+  image.width = image.height = size;
+  image.loading = "lazy";
+  image.decoding = "async";
+  image.addEventListener("error", () => { image.src = fallback; }, { once: true });
+  image.src = src || fallback;
+  return image;
+}
+
 function trackerRow(item, guild) {
   const li = document.createElement("li");
   const link = document.createElement("a");
-  const initial = document.createElement("span");
   const title = document.createElement("span");
   const name = document.createElement("strong");
   const handle = document.createElement("small");
   const state = document.createElement("span");
   link.href = serverRoute(guild, item.channel);
-  initial.className = "tracker-initial";
-  initial.setAttribute("aria-hidden", "true");
   name.textContent = item.name || item.username;
-  initial.textContent = name.textContent.trim().slice(0, 2).toUpperCase();
   handle.textContent = `@${item.username}`;
   title.className = "row-title";
   title.append(name, handle);
   state.className = "row-state";
   state.dataset.paused = String(Boolean(item.paused));
   state.textContent = item.paused ? "Paused" : "Monitoring";
-  link.append(initial, title, state, rowArrow());
+  link.append(rowImage(item.avatar, "../assets/rt-logo.webp", "tracker-avatar", 44), title, state, rowArrow());
   li.append(link);
   return li;
 }
 
-function renderServers(servers) {
-  const entries = (servers || []).filter(server => snowflake.test(server.id))
-    .sort((left, right) => left.name.localeCompare(right.name));
+function renderServers() {
+  const filter = serverSearch.value.trim().toLowerCase();
+  const entries = sharedServers.filter(server => server.name.toLowerCase().includes(filter));
   byId("server-list").replaceChildren(...entries.map(server => {
     const item = document.createElement("li");
     const link = document.createElement("a");
-    const icon = document.createElement("img");
     const name = document.createElement("span");
     link.href = serverRoute(server.id);
-    icon.src = server.icon || "../assets/rt-logo.webp";
-    icon.alt = "";
-    icon.width = 38;
-    icon.height = 38;
-    icon.addEventListener("error", () => { icon.src = "../assets/rt-logo.webp"; }, { once: true });
     name.textContent = server.name;
-    link.append(icon, name, rowArrow());
+    link.append(rowImage(server.icon, "../assets/discord.svg", "server-icon", 60), name, rowArrow());
     item.append(link);
     return item;
   }));
-  byId("server-count").textContent = entries.length ? `${entries.length} shared ${entries.length === 1 ? "server" : "servers"}` : "";
-  byId("servers-empty").hidden = entries.length !== 0;
+  const count = filter ? `${entries.length} of ${sharedServers.length}` : entries.length;
+  byId("server-count").textContent = sharedServers.length ? `${count} shared ${sharedServers.length === 1 ? "server" : "servers"}` : "";
+  byId("servers-empty").hidden = sharedServers.length !== 0;
+  byId("servers-no-match").hidden = !sharedServers.length || entries.length !== 0;
 }
 
 function renderIndex() {
@@ -255,6 +269,7 @@ function locked(message) {
   rendered = "";
   commandInput.value = "";
   search.value = "";
+  serverSearch.value = "";
   searchGuild = null;
   setTrackerFilter("all");
   byId("pairing").hidden = true;
@@ -295,9 +310,12 @@ async function refresh() {
         showPanel("detail");
         renderDetail(result.data.tracker);
         renderViewer(result.viewer, "detail", result.data.server?.id, "Tracker profile");
-      } else if (result.data.servers) {
+      } else if (Array.isArray(result.data.servers)) {
         showPanel("servers");
-        renderServers(result.data.servers);
+        sharedServers = result.data.servers
+          .filter(server => typeof server?.name === "string" && snowflake.test(server.id))
+          .sort((left, right) => left.name.localeCompare(right.name));
+        renderServers();
         renderViewer(result.viewer, "servers", null, "Servers");
       } else {
         showPanel("index");
@@ -428,6 +446,7 @@ byId("viewer-avatar").addEventListener("error", event => {
   if (!image.src.endsWith("/discord.svg")) image.src = "../assets/discord.svg";
 });
 search.addEventListener("input", renderIndex);
+serverSearch.addEventListener("input", renderServers);
 for (const button of filterButtons) {
   button.addEventListener("click", () => {
     setTrackerFilter(button.dataset.filter);
@@ -472,6 +491,7 @@ document.addEventListener("fullscreenchange", () => {
 window.addEventListener("hashchange", () => {
   if (!token) return;
   showPanel(null);
+  status.textContent = "Checking your Discord access…";
   rendered = "";
   refresh();
 });
@@ -502,4 +522,8 @@ document.addEventListener("visibilitychange", () => {
 window.setInterval(() => { if (!document.hidden) refresh(); }, 5000);
 await finishSignIn();
 showSignInOptions();
-if (token) { showPanel(null); refresh(); }
+if (token) {
+  showPanel(null);
+  status.textContent = "Checking your Discord access…";
+  refresh();
+}
