@@ -156,6 +156,12 @@ section[id] { scroll-margin-top: 1.5rem; }
 }
 .actions { display: flex; justify-content: center; flex-wrap: wrap; gap: .75rem; margin-top: 1.65rem; }
 .hero .button { min-width: 120px; }
+.nav-actions .dashboard-shortcut, .hero .dashboard-shortcut { flex: none; min-width: 0; padding: 0; }
+.nav-actions .dashboard-shortcut { width: 2.5rem; }
+.hero .dashboard-shortcut { width: 3.1rem; background: #1d2b4e; border-color: #566b9d; }
+.hero .dashboard-shortcut:hover { background: #324986; border-color: #a7bdff; }
+.nav-actions .dashboard-shortcut img { width: 1.45rem; height: 1.45rem; }
+.hero .dashboard-shortcut img { width: 1.8rem; height: 1.8rem; }
 .hero-scroll {
   display: grid;
   place-items: center;
@@ -288,9 +294,15 @@ section[id] { scroll-margin-top: 1.5rem; }
 
 @media (max-width: 435px) {
   .hero h1 { font-size: clamp(2.07rem, 9.3vw, 2.7rem); }
-  .hero .button { min-width: 0; padding-inline: .95rem; }
+  .hero .button:not(.dashboard-shortcut) { min-width: 0; padding-inline: .95rem; }
   .rows > div { grid-template-columns: 1fr; gap: .15rem; }
-  .nav-actions .button { padding-inline: .56rem; }
+  .nav-actions .button:not(.dashboard-shortcut) { padding-inline: .56rem; }
+  .hero .actions { column-gap: .55rem; }
+}
+@media (max-width: 360px) {
+  .hero .actions { column-gap: .4rem; }
+  .hero .button:not(.dashboard-shortcut) { padding-inline: .5rem; font-size: .88rem; }
+  .hero .dashboard-shortcut { width: 2.8rem; }
 }
 
 @media (prefers-reduced-motion: no-preference) {

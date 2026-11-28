@@ -10,7 +10,7 @@
   <title>Tracker dashboard | RobloTracker</title>
   <link rel="icon" href="../assets/rt-logo.webp" type="image/webp">
   <link rel="stylesheet" href="../assets/site.css?v=button-feedback">
-  <link rel="stylesheet" href="../assets/dashboard.css?v=tracker-navigation">
+  <link rel="stylesheet" href="../assets/dashboard.css?v=dashboard-shortcuts">
   <script src="../assets/dashboard.js?v=tracker-navigation" type="module"></script>
 </head>
 <body class="dashboard-page">
@@ -87,7 +87,10 @@
     </section>
     <section id="servers" class="server-library" aria-labelledby="servers-title" hidden>
       <header class="workspace-section-title">
-        <div><h1 id="servers-title">Your servers</h1><p id="server-count" role="status"></p></div>
+        <div class="directory-heading">
+          <img src="../assets/dashboard-mark.png" width="40" height="40" alt="">
+          <div><h1 id="servers-title">Your servers</h1><p id="server-count" role="status"></p></div>
+        </div>
         <div class="server-search">
           <label for="server-search">Find a server</label>
           <input id="server-search" type="search" placeholder="Search by name" autocomplete="off">

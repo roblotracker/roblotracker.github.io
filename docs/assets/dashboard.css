@@ -157,6 +157,9 @@
 .dashboard-panel p { margin-top: .45rem; }
 .workspace-section-title { display: flex; align-items: end; justify-content: space-between; flex-wrap: wrap; gap: 1rem 2rem; margin-bottom: 1.75rem; }
 .workspace-section-title p { margin-top: .55rem; color: var(--desk-muted); font-size: .92rem; }
+.directory-heading { display: flex; align-items: flex-start; gap: .85rem; min-width: 0; }
+.directory-heading img { flex: none; width: clamp(2rem, 3vw, 2.5rem); margin-top: .2rem; }
+.server-library .workspace-section-title { padding-bottom: 1.2rem; border-bottom: 1px solid var(--desk-line); }
 .server-search { flex: 0 1 19rem; }
 .server-search input { width: 100%; }
 .dashboard-empty, #servers-no-match, #servers-empty { padding: 1.25rem; border: 1px dashed #485575; border-radius: .75rem; color: var(--desk-muted); }
@@ -219,17 +222,20 @@
   min-height: 2.45rem;
   padding: .38rem .65rem;
   border-radius: .45rem;
-  background: #222f4d;
+  border: 1px solid #3a4969;
+  background: #1d2941;
   color: #e0e9ff;
   font-size: .84rem;
 }
 .server-list a:is(:hover, :focus-visible) .server-card-action { background: #30426c; }
+.server-list a:focus-visible { outline-offset: 3px; }
 #servers-empty .button, #denied > .button { margin-top: .8rem; }
 .tracker-toolbar { display: flex; justify-content: space-between; align-items: end; gap: .8rem 1.5rem; flex-wrap: wrap; margin-bottom: 1.4rem; }
 .tracker-toolbar #tracker-server { margin: 0 0 .4rem; color: var(--desk-accent); }
 .tracker-context { display: flex; gap: .9rem; align-items: center; min-width: 0; overflow-wrap: anywhere; }
 .tracker-context .server-icon { width: 3rem; height: 3rem; border-radius: .65rem; }
 .tracker-context .server-icon-default { padding: .65rem; }
+.tracker-toolbar { padding-bottom: 1rem; border-bottom: 1px solid var(--desk-line); }
 .tracker-search { flex: 0 1 21rem; }
 .tracker-search input { width: 100%; }
 .dashboard-panel .list-count { margin-bottom: .35rem; }
@@ -411,7 +417,7 @@
   .server-list a { grid-template-columns: 3.25rem minmax(0, 1fr); grid-template-rows: auto auto; align-items: center; gap: .55rem .85rem; padding: .85rem; }
   .server-list .server-icon { width: 3.25rem; height: 3.25rem; grid-row: 1 / 3; }
   .server-list .server-icon-default { padding: .75rem; }
-  .server-card-action { justify-self: start; gap: .55rem; min-height: unset; padding: 0; background: transparent; }
+  .server-card-action { justify-self: start; gap: .55rem; min-height: unset; padding: 0; border: 0; background: transparent; }
   .server-list a:is(:hover, :focus-visible) .server-card-action { background: transparent; color: white; }
 }
 @media (max-width: 390px) {
