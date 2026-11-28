@@ -10,19 +10,25 @@
   <title>Tracker dashboard | RobloTracker</title>
   <link rel="icon" href="../assets/rt-logo.webp" type="image/webp">
   <link rel="stylesheet" href="../assets/site.css?v=button-feedback">
-  <link rel="stylesheet" href="../assets/dashboard.css?v=activity-feed">
-  <script src="../assets/dashboard.js?v=activity-feed" type="module"></script>
+  <link rel="stylesheet" href="../assets/dashboard.css?v=sidebar-icons">
+  <script src="../assets/dashboard.js?v=sidebar-icons" type="module"></script>
 </head>
 <body class="dashboard-page">
   <a class="skip" href="#content">Skip to dashboard</a>
   <header class="dashboard-header">
     <div class="dashboard-top">
       <div class="dashboard-identity">
-        <button id="sidebar-toggle" class="dashboard-tool" type="button" aria-controls="workspace-rail" aria-expanded="true" aria-label="Collapse sidebar" title="Collapse sidebar" hidden><span class="sidebar-icon" aria-hidden="true"></span></button>
+        <button id="sidebar-toggle" class="dashboard-tool" type="button" aria-controls="workspace-rail" aria-expanded="true" aria-label="Collapse sidebar" title="Collapse sidebar" hidden>
+          <svg class="dashboard-icon icon-expanded" aria-hidden="true"><use href="../assets/dashboard-icons.svg#panel-left-close"></use></svg>
+          <svg class="dashboard-icon icon-collapsed" aria-hidden="true"><use href="../assets/dashboard-icons.svg#panel-left-open"></use></svg>
+        </button>
         <a class="brand" href="../"><img src="../assets/rt-logo.webp" width="34" height="34" alt="">RobloTracker</a>
       </div>
       <div class="dashboard-nav">
-        <button id="fullscreen-toggle" class="dashboard-tool" type="button" aria-pressed="false" aria-label="Full screen" title="Full screen" hidden><span class="fullscreen-icon" aria-hidden="true"></span></button>
+        <button id="fullscreen-toggle" class="dashboard-tool" type="button" aria-pressed="false" aria-label="Full screen" title="Full screen" hidden>
+          <svg class="dashboard-icon icon-maximize" aria-hidden="true"><use href="../assets/dashboard-icons.svg#maximize"></use></svg>
+          <svg class="dashboard-icon icon-minimize" aria-hidden="true"><use href="../assets/dashboard-icons.svg#minimize"></use></svg>
+        </button>
         <div id="viewer" class="viewer-chip" hidden>
           <img id="viewer-avatar" width="26" height="26" alt="" hidden>
           <span id="viewer-name"></span>
@@ -34,11 +40,20 @@
   <main class="dashboard" id="content" data-panel="access" data-sidebar="expanded" tabindex="-1">
     <aside class="workspace-rail" id="workspace-rail">
       <div class="rail-content">
-      <nav class="rail-nav" aria-label="Dashboard navigation" id="workspace-nav" hidden>
-        <a href="#" id="servers-back" aria-label="Servers" title="Servers" hidden><span class="rail-mark rail-servers" aria-hidden="true"></span><span class="rail-label">Servers</span></a>
-        <a href="#" id="trackers-back" aria-label="Trackers" title="Trackers" hidden><span class="rail-mark rail-trackers" aria-hidden="true"></span><span class="rail-label">Trackers</span></a>
-      </nav>
-      <a class="rail-help" href="../#commands" aria-label="Command guide" title="Command guide"><span class="rail-mark rail-guide" aria-hidden="true"></span><span class="rail-label">Command guide</span></a>
+        <nav class="rail-nav" aria-label="Dashboard navigation" id="workspace-nav" hidden>
+          <a href="#" id="servers-back" aria-label="Servers" title="Servers" hidden>
+            <svg class="dashboard-icon" aria-hidden="true"><use href="../assets/dashboard-icons.svg#server"></use></svg>
+            <span class="rail-label">Servers</span>
+          </a>
+          <a href="#" id="trackers-back" aria-label="Trackers" title="Trackers" hidden>
+            <svg class="dashboard-icon" aria-hidden="true"><use href="../assets/dashboard-icons.svg#radar"></use></svg>
+            <span class="rail-label">Trackers</span>
+          </a>
+        </nav>
+        <a class="rail-help" href="../#commands" aria-label="Command guide" title="Command guide">
+          <svg class="dashboard-icon" aria-hidden="true"><use href="../assets/dashboard-icons.svg#book-open"></use></svg>
+          <span class="rail-label">Command guide</span>
+        </a>
       </div>
     </aside>
     <div class="workspace-content">

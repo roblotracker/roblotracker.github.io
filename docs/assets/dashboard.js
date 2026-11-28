@@ -162,12 +162,25 @@ function rowArrow() {
 }
 
 function setImage(image, src) {
-  if (!src) {
+  let url;
+  if (typeof src === "string" && src.startsWith("https://")) {
+    try {
+      const candidate = new URL(src);
+      const host = candidate.hostname;
+      if (!candidate.username && !candidate.password && !candidate.port &&
+          (host === "cdn.discordapp.com" || host === "rbxcdn.com" || host.endsWith(".rbxcdn.com"))) {
+        url = candidate.href;
+      }
+    } catch {
+      // Skip malformed image URLs from service responses.
+    }
+  }
+  if (!url) {
     image.hidden = true;
     image.removeAttribute("src");
-  } else if (image.getAttribute("src") !== src) {
+  } else if (image.getAttribute("src") !== url) {
     image.hidden = false;
-    image.src = src;
+    image.src = url;
   }
 }
 
