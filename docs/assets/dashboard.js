@@ -34,6 +34,7 @@ let activity = [];
 let activityChannel = null;
 let rendered = "";
 let generation = 0;
+let lastReadyData;
 
 try {
   token = localStorage.getItem(storageKey);
@@ -111,6 +112,7 @@ async function post(path, data = {}, authorization = token, requestSignal) {
 }
 
 function showPanel(panel) {
+  if (!panel || panel === "access" || panel === "denied") lastReadyData = undefined;
   content.dataset.panel = panel || "loading";
   sidebarToggle.hidden = panel === "access";
   fullscreenToggle.hidden = !document.fullscreenEnabled || panel === "access";
@@ -373,6 +375,7 @@ function renderDetail(tracker, guild, channel) {
 function renderTrackerPage(route, data) {
   const { section = "overview", page = 1, signal = "" } = route;
   const guild = data.server?.id || route.guild;
+  byId("back-to-trackers").href = serverRoute(guild);
   for (const tab of trackerTabs) {
     tab.href = serverRoute(guild, route.channel, tab.dataset.section);
     if (tab.dataset.section === section) tab.setAttribute("aria-current", "page");
@@ -504,7 +507,11 @@ async function refresh() {
       commandInput.value = result.code;
       status.textContent = "After you enter your code in Discord, your profile will load here automatically.";
     } else if (result.state === "ready" && result.data) {
-      status.textContent = `Updated ${timeText(result.updated)}`;
+      const updateText = result.updated ? `Updated ${timeText(result.updated)}` : "";
+      if (status.textContent !== updateText) status.textContent = updateText;
+      const pageData = JSON.stringify([routeHash, result.data, result.viewer]);
+      if (lastReadyData === pageData) return;
+      lastReadyData = pageData;
       if (result.data.tracker) {
         showPanel("detail");
         renderDetail(result.data.tracker, result.data.server?.id, route.channel);

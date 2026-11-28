@@ -308,6 +308,15 @@ section[id] { scroll-margin-top: 1.5rem; }
   .hero .button:not(.dashboard-shortcut) { padding-inline: .5rem; font-size: .88rem; }
   .hero .dashboard-shortcut { width: 2.8rem; }
 }
+@media (max-width: 670px) {
+  .landing-page { --nav-offset: 7.4rem; }
+  .landing-page .nav { flex-wrap: nowrap; }
+  .landing-page .nav > a:not(.button), .landing-page .nav-actions > .button { min-height: 2.65rem; }
+  .landing-page .nav > a:not(.button) { display: inline-flex; align-items: center; }
+  .landing-page .hero-inner { padding-block: calc(var(--nav-offset) + 1.35rem) 1.45rem; }
+  .landing-page .hero #hero-title { font-size: clamp(2.25rem, 8.1vw, 3.15rem); }
+  .landing-page .hero-inner > p { max-width: 32ch; line-height: 1.55; }
+}
 
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; }
